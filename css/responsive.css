@@ -1,0 +1,541 @@
+/* =============================================
+   RESPONSIVE STYLES - INVENTORY MANAGEMENT
+   ============================================= */
+
+/* Extra Large Devices (1400px and up) */
+@media (min-width: 1400px) {
+    .container-custom {
+        max-width: 1320px;
+    }
+}
+
+/* Large Devices (992px to 1399px) */
+@media (max-width: 1399px) {
+    .content-area {
+        padding: 25px;
+    }
+    
+    .stat-card-custom {
+        padding: 20px;
+    }
+}
+
+/* Medium Devices - Tablets (768px to 991px) */
+@media (max-width: 991px) {
+    /* Sidebar adjustments */
+    .sidebar {
+        width: 220px;
+    }
+    
+    .main-content {
+        margin-left: 220px;
+    }
+    
+    .sidebar.collapsed {
+        width: 70px;
+    }
+    
+    .main-content.expanded {
+        margin-left: 70px;
+    }
+    
+    /* Content adjustments */
+    .content-area {
+        padding: 20px;
+    }
+    
+    /* Top navbar */
+    .search-bar {
+        width: 250px;
+    }
+    
+    /* Page header */
+    .page-header-custom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .page-title-custom {
+        font-size: 24px;
+    }
+    
+    /* Stat cards */
+    .stat-number {
+        font-size: 28px;
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+    
+    /* Tables */
+    .table-custom-style {
+        font-size: 14px;
+    }
+    
+    .table-custom-style thead th,
+    .table-custom-style tbody td {
+        padding: 12px;
+    }
+    
+    /* Charts */
+    .chart-card {
+        margin-bottom: 20px;
+    }
+}
+
+/* Small Devices - Mobile (576px to 767px) */
+@media (max-width: 767px) {
+    /* Sidebar - Hidden by default on mobile */
+    .sidebar {
+        left: -260px;
+        width: 260px;
+        transition: left 0.3s ease;
+    }
+    
+    .sidebar.show {
+        left: 0;
+        box-shadow: 2px 0 20px rgba(0,0,0,0.3);
+    }
+    
+    /* Main content takes full width */
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .main-content.expanded {
+        margin-left: 0;
+    }
+    
+    /* Top navbar mobile */
+    .top-navbar {
+        padding: 12px 15px;
+    }
+    
+    .search-bar {
+        display: none;
+    }
+    
+    .navbar-actions {
+        gap: 15px;
+    }
+    
+    .navbar-icon {
+        font-size: 18px;
+    }
+    
+    /* Content area */
+    .content-area {
+        padding: 15px;
+    }
+    
+    /* Page header mobile */
+    .page-header-custom {
+        padding: 20px 15px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .page-title-custom {
+        font-size: 22px;
+    }
+    
+    .page-subtitle-custom {
+        font-size: 13px;
+    }
+    
+    /* Stat cards mobile */
+    .stat-card-custom {
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .stat-number {
+        font-size: 26px;
+    }
+    
+    .stat-label {
+        font-size: 13px;
+    }
+    
+    .stat-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+        margin-bottom: 12px;
+    }
+    
+    /* Buttons mobile */
+    .btn-gradient,
+    .btn-outline-custom {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+    
+    .btn-custom {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    /* Cards mobile */
+    .card-custom {
+        padding: 20px 15px;
+        margin-bottom: 15px;
+    }
+    
+    .table-card {
+        padding: 15px;
+    }
+    
+    .table-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    /* Tables mobile - Make scrollable */
+    .table-responsive {
+        border-radius: 10px;
+    }
+    
+    .table-custom-style {
+        font-size: 13px;
+    }
+    
+    .table-custom-style thead th,
+    .table-custom-style tbody td {
+        padding: 10px 8px;
+        white-space: nowrap;
+    }
+    
+    /* Hide certain columns on mobile */
+    .table-custom-style .hide-mobile {
+        display: none;
+    }
+    
+    /* Forms mobile */
+    .form-control-custom {
+        padding: 10px 12px;
+    }
+    
+    /* Modal mobile */
+    .modal-custom .modal-dialog {
+        margin: 10px;
+    }
+    
+    .modal-custom .modal-content {
+        border-radius: 12px;
+    }
+    
+    .modal-custom .modal-body {
+        padding: 20px 15px;
+    }
+    
+    /* Charts mobile */
+    .chart-card {
+        padding: 20px 15px;
+    }
+    
+    .chart-title {
+        font-size: 16px;
+    }
+    
+    /* User profile mobile */
+    .user-profile .d-none {
+        display: none !important;
+    }
+    
+    /* Breadcrumb mobile */
+    .breadcrumb {
+        font-size: 13px;
+    }
+}
+
+/* Extra Small Devices (less than 576px) */
+@media (max-width: 575px) {
+    /* Sidebar */
+    .sidebar {
+        width: 240px;
+        left: -240px;
+    }
+    
+    .sidebar-header {
+        padding: 15px;
+    }
+    
+    .sidebar-header h4 {
+        font-size: 16px;
+    }
+    
+    .menu-link {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+    
+    .menu-link i {
+        width: 35px;
+        font-size: 18px;
+    }
+    
+    /* Top navbar */
+    .top-navbar {
+        padding: 10px 12px;
+    }
+    
+    .navbar-icon {
+        font-size: 16px;
+    }
+    
+    .user-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    
+    /* Content area */
+    .content-area {
+        padding: 12px;
+    }
+    
+    /* Page header */
+    .page-header-custom {
+        padding: 15px 12px;
+    }
+    
+    .page-title-custom {
+        font-size: 20px;
+    }
+    
+    .page-subtitle-custom {
+        font-size: 12px;
+    }
+    
+    /* Stat cards */
+    .stat-card-custom {
+        padding: 15px;
+    }
+    
+    .stat-number {
+        font-size: 24px;
+    }
+    
+    .stat-label {
+        font-size: 12px;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    
+    .stat-change {
+        font-size: 11px;
+    }
+    
+    /* Tables */
+    .table-card {
+        padding: 12px;
+    }
+    
+    .table-card-title {
+        font-size: 18px;
+    }
+    
+    .table-custom-style {
+        font-size: 12px;
+    }
+    
+    .table-custom-style thead th,
+    .table-custom-style tbody td {
+        padding: 8px 6px;
+    }
+    
+    /* Badges */
+    .badge-custom,
+    .badge-status {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+    
+    /* Buttons */
+    .btn-gradient,
+    .btn-outline-custom,
+    .btn-custom {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+    
+    /* Forms */
+    .form-label-custom {
+        font-size: 13px;
+    }
+    
+    .form-control-custom {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    
+    /* Charts */
+    .chart-card {
+        padding: 15px 12px;
+    }
+    
+    .chart-title {
+        font-size: 15px;
+        margin-bottom: 15px;
+    }
+    
+    /* Modal */
+    .modal-custom .modal-header,
+    .modal-custom .modal-body,
+    .modal-custom .modal-footer {
+        padding: 15px 12px;
+    }
+    
+    .modal-title {
+        font-size: 18px;
+    }
+    
+    /* Empty state */
+    .empty-state {
+        padding: 40px 15px;
+    }
+    
+    .empty-state i {
+        font-size: 48px;
+    }
+    
+    .empty-state h3 {
+        font-size: 18px;
+    }
+}
+
+/* Landscape Mobile Devices */
+@media (max-width: 767px) and (orientation: landscape) {
+    .sidebar {
+        height: 100vh;
+        overflow-y: auto;
+    }
+    
+    .stat-card-custom {
+        padding: 15px;
+    }
+    
+    .stat-number {
+        font-size: 22px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    /* Hide navigation and interactive elements */
+    .sidebar,
+    .top-navbar,
+    .navbar-actions,
+    .btn-gradient,
+    .btn-outline-custom,
+    .btn-custom,
+    .toggle-btn {
+        display: none !important;
+    }
+    
+    /* Adjust main content */
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    .content-area {
+        padding: 0 !important;
+    }
+    
+    /* Remove shadows and borders */
+    .card-custom,
+    .stat-card-custom,
+    .table-card,
+    .chart-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        page-break-inside: avoid;
+    }
+    
+    /* Adjust tables for print */
+    .table-custom-style {
+        font-size: 11px;
+    }
+    
+    .table-custom-style thead {
+        background: #f0f0f0 !important;
+    }
+    
+    /* Hide badges backgrounds */
+    .badge-custom,
+    .badge-status {
+        border: 1px solid currentColor;
+        background: white !important;
+    }
+    
+    /* Page breaks */
+    .page-header-custom,
+    .stat-card-custom,
+    .table-card {
+        page-break-inside: avoid;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid;
+    }
+}
+
+/* Tablet Specific (iPad, etc.) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .sidebar {
+        width: 240px;
+    }
+    
+    .main-content {
+        margin-left: 240px;
+    }
+    
+    .sidebar.collapsed {
+        width: 75px;
+    }
+    
+    .main-content.expanded {
+        margin-left: 75px;
+    }
+    
+    .search-bar {
+        width: 280px;
+    }
+    
+    .content-area {
+        padding: 25px 20px;
+    }
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+    /* Uncomment to enable dark mode */
+    /*
+    body {
+        background-color: #1a1a1a;
+        color: #e0e0e0;
+    }
+    
+    .card-custom,
+    .stat-card-custom,
+    .table-card {
+        background: #2a2a2a;
+    }
+    
+    .table-custom-style thead {
+        background: #333;
+    }
+    */
+}

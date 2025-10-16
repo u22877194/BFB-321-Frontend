@@ -1,0 +1,109 @@
+# 📦 Inventory Management System
+
+A comprehensive web-based inventory management system built with HTML5, CSS3, Bootstrap 5, and JavaScript.
+
+## ✨ Features
+
+- Product Management (Add, Edit, Delete, List)
+- Inventory Overview & Tracking
+- Purchase Order Management
+- Transfer Orders Between Locations
+- Supplier Management
+- Location Management
+- Category Management
+- User & Role Management
+- Responsive Design (Mobile, Tablet, Desktop)
+- Interactive Dashboard with Charts
+- Export to CSV
+- Print Functionality
+
+## 📁 Project Structure
+```
+inventory-management-system/
+├── index.html                  # Login page
+├── dashboard.html              # Main dashboard
+├── css/
+│   ├── style.css
+│   └── responsive.css
+├── js/
+│   ├── main.js
+│   └── charts.js
+├── pages/
+│   ├── products/
+│   ├── inventory/
+│   ├── purchase-orders/
+│   ├── transfer-orders/
+│   ├── locations/
+│   ├── suppliers/
+│   ├── categories/
+│   └── users/
+├── assets/
+│   ├── images/
+│   └── icons/
+└── components/
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Modern web browser
+- VS Code (recommended)
+- Live Server extension
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/YOUR-USERNAME/inventory-management-system.git
+```
+
+2. Open in VS Code
+```bash
+cd inventory-management-system
+code .
+```
+
+3. Open with Live Server
+- Right-click `index.html`
+- Select "Open with Live Server"
+
+### Demo Login
+```
+Email: admin@example.com
+Password: admin123
+```
+
+## 🛠️ Technology Stack
+
+- HTML5
+- CSS3
+- Bootstrap 5.3.0
+- JavaScript (ES6+)
+- Chart.js 4.4.0
+
+## 📊 Database Tables
+
+1. organizations
+2. users
+3. roles
+4. user_roles
+5. locations
+6. sub_locations
+7. categories
+8. sub_categories
+9. products
+10. inventory
+11. purchase_orders
+12. purchase_order_items
+13. transfer_orders
+14. transfer_order_items
+15. inventory_transactions
+16. suppliers
+
+## 📝 License
+
+MIT License
+
+## 👤 Author
+
+Your Name - [GitHub Profile](https://github.com/YOUR-USERNAME)
