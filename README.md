@@ -134,40 +134,367 @@ Password: admin123
 
 ## Database Schema
 
-The system is designed to work with a relational database consisting of 16 core tables.
+The system uses a fully normalized (3NF) relational database with 19 core tables.
 
 ### Entity Relationship Diagram (ERD)
-   
-   ![Database ERD](docs/ERD-Diagram.png)
-   
-   *The ERD shows the complete database structure with all tables, relationships, and foreign key constraints.*
+```mermaid
+erDiagram
+    addresses {
+        INT address_id PK
+        TEXT street_address
+        VARCHAR city
+        VARCHAR state_province
+        VARCHAR country
+        VARCHAR postal_code
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    organizations {
+        INT organization_id PK
+        VARCHAR organization_name
+        VARCHAR organization_code UK
+        INT address_id FK
+        VARCHAR phone
+        VARCHAR email
+        VARCHAR website
+        VARCHAR tax_number
+        VARCHAR currency_code
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    permissions {
+        INT permission_id PK
+        VARCHAR permission_name UK
+        VARCHAR permission_code UK
+        VARCHAR permission_category
+        TEXT description
+        BOOLEAN is_active
+        TIMESTAMP created_at
+    }
+    
+    roles {
+        INT role_id PK
+        VARCHAR role_name
+        TEXT role_description
+        INT organization_id FK
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    role_permissions {
+        INT role_permission_id PK
+        INT role_id FK
+        INT permission_id FK
+        TIMESTAMP granted_date
+    }
+    
+    users {
+        INT user_id PK
+        INT organization_id FK
+        VARCHAR username UK
+        VARCHAR email UK
+        VARCHAR password_hash
+        VARCHAR first_name
+        VARCHAR last_name
+        VARCHAR phone
+        BOOLEAN is_active
+        TIMESTAMP last_login
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    user_roles {
+        INT user_role_id PK
+        INT user_id FK
+        INT role_id FK
+        TIMESTAMP assigned_date
+    }
+    
+    locations {
+        INT location_id PK
+        INT organization_id FK
+        VARCHAR location_name
+        VARCHAR location_code UK
+        VARCHAR location_type
+        INT address_id FK
+        VARCHAR phone
+        VARCHAR email
+        INT manager_user_id FK
+        DECIMAL capacity_limit
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    sub_locations {
+        INT sub_location_id PK
+        INT location_id FK
+        VARCHAR sub_location_name
+        VARCHAR sub_location_code
+        TEXT description
+        VARCHAR aisle
+        VARCHAR rack
+        VARCHAR shelf
+        VARCHAR bin
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    categories {
+        INT category_id PK
+        INT organization_id FK
+        VARCHAR category_name
+        VARCHAR category_code
+        TEXT description
+        INT parent_category_id FK
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    sub_categories {
+        INT sub_category_id PK
+        INT category_id FK
+        VARCHAR sub_category_name
+        VARCHAR sub_category_code
+        TEXT description
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    suppliers {
+        INT supplier_id PK
+        INT organization_id FK
+        VARCHAR supplier_name
+        VARCHAR supplier_code UK
+        VARCHAR contact_person
+        INT address_id FK
+        VARCHAR phone
+        VARCHAR email
+        VARCHAR website
+        VARCHAR tax_number
+        VARCHAR payment_terms
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    products {
+        INT product_id PK
+        INT organization_id FK
+        VARCHAR product_name
+        VARCHAR sku UK
+        VARCHAR barcode UK
+        TEXT description
+        INT category_id FK
+        INT sub_category_id FK
+        INT supplier_id FK
+        VARCHAR unit_of_measure
+        DECIMAL unit_price
+        DECIMAL cost_price
+        INT reorder_level
+        INT reorder_quantity
+        BOOLEAN is_active
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    inventory {
+        INT inventory_id PK
+        INT product_id FK
+        INT location_id FK
+        INT sub_location_id FK
+        INT quantity_on_hand
+        INT quantity_reserved
+        INT quantity_available "COMPUTED"
+        TIMESTAMP last_stock_date
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    purchase_orders {
+        INT po_id PK
+        INT organization_id FK
+        VARCHAR po_number UK
+        INT supplier_id FK
+        INT destination_location_id FK
+        DATE po_date
+        DATE expected_delivery_date
+        VARCHAR status
+        DECIMAL subtotal
+        DECIMAL tax_rate
+        DECIMAL tax_amount "COMPUTED"
+        DECIMAL shipping_cost
+        DECIMAL total_amount "COMPUTED"
+        TEXT notes
+        INT created_by FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    purchase_order_items {
+        INT po_item_id PK
+        INT po_id FK
+        INT product_id FK
+        INT quantity_ordered
+        INT quantity_received
+        DECIMAL unit_price
+        DECIMAL line_total "COMPUTED"
+        TIMESTAMP created_at
+    }
+    
+    transfer_orders {
+        INT transfer_id PK
+        INT organization_id FK
+        VARCHAR transfer_number UK
+        INT from_location_id FK
+        INT to_location_id FK
+        DATE transfer_date
+        DATE expected_arrival_date
+        VARCHAR status
+        TEXT notes
+        INT created_by FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    transfer_order_items {
+        INT transfer_item_id PK
+        INT transfer_id FK
+        INT product_id FK
+        INT quantity_to_transfer
+        INT quantity_received
+        TIMESTAMP created_at
+    }
+    
+    inventory_transactions {
+        INT transaction_id PK
+        INT organization_id FK
+        VARCHAR transaction_number UK
+        INT product_id FK
+        INT location_id FK
+        INT sub_location_id FK
+        VARCHAR transaction_type
+        INT quantity
+        DECIMAL unit_price
+        DECIMAL total_value "COMPUTED"
+        VARCHAR reference_number
+        TEXT notes
+        INT performed_by FK
+        TIMESTAMP transaction_date
+    }
 
-### Core Tables### 
+    %% Relationships
+    
+    %% Address relationships
+    addresses ||--o{ organizations : "located at"
+    addresses ||--o{ locations : "located at"
+    addresses ||--o{ suppliers : "located at"
+    
+    %% Organization relationships
+    organizations ||--o{ users : "employs"
+    organizations ||--o{ roles : "defines"
+    organizations ||--o{ locations : "owns"
+    organizations ||--o{ categories : "uses"
+    organizations ||--o{ suppliers : "works with"
+    organizations ||--o{ products : "manages"
+    organizations ||--o{ purchase_orders : "creates"
+    organizations ||--o{ transfer_orders : "creates"
+    organizations ||--o{ inventory_transactions : "records"
+    
+    %% Permission relationships
+    permissions ||--o{ role_permissions : "granted to"
+    roles ||--o{ role_permissions : "has"
+    roles ||--o{ user_roles : "assigned to"
+    users ||--o{ user_roles : "has"
+    
+    %% Location relationships
+    locations ||--o{ sub_locations : "contains"
+    locations ||--o{ inventory : "stores"
+    locations ||--o{ purchase_orders : "receives"
+    locations ||--o{ transfer_orders : "sends from"
+    locations ||--o{ transfer_orders : "receives at"
+    locations ||--o{ inventory_transactions : "occurs at"
+    users ||--o{ locations : "manages"
+    
+    %% Category relationships
+    categories ||--o{ sub_categories : "contains"
+    categories ||--o{ products : "categorizes"
+    categories ||--o{ categories : "parent of"
+    sub_categories ||--o{ products : "subcategorizes"
+    
+    %% Product relationships
+    suppliers ||--o{ products : "supplies"
+    products ||--o{ inventory : "stored as"
+    products ||--o{ purchase_order_items : "ordered in"
+    products ||--o{ transfer_order_items : "transferred in"
+    products ||--o{ inventory_transactions : "involved in"
+    
+    %% Order relationships
+    purchase_orders ||--o{ purchase_order_items : "contains"
+    suppliers ||--o{ purchase_orders : "fulfills"
+    users ||--o{ purchase_orders : "creates"
+    
+    transfer_orders ||--o{ transfer_order_items : "contains"
+    users ||--o{ transfer_orders : "creates"
+    
+    %% Inventory relationships
+    sub_locations ||--o{ inventory : "stores"
+    sub_locations ||--o{ inventory_transactions : "occurs at"
+    users ||--o{ inventory_transactions : "performs"
+```
 
-1. **organizations** - Organization/company information
-2. **users** - User accounts
-3. **roles** - User role definitions
-4. **user_roles** - User-role relationships (Many-to-Many)
-5. **locations** - Warehouses and branches
-6. **sub_locations** - Sub-divisions within locations
-7. **categories** - Product categories
-8. **sub_categories** - Product sub-categories
-9. **products** - Product master data
-10. **inventory** - Current stock levels by location
-11. **purchase_orders** - Purchase order headers
-12. **purchase_order_items** - PO line items
-13. **transfer_orders** - Stock transfer headers
-14. **transfer_order_items** - Transfer line items
+### Database Overview
+
+### Core Tables
+
+**Organization & Users**
+1. **addresses** - Centralized address storage (eliminates redundancy)
+2. **organizations** - Company information
+3. **permissions** - System permissions
+4. **roles** - User roles
+5. **role_permissions** - Role-permission mapping (Many-to-Many)
+6. **users** - User accounts
+7. **user_roles** - User-role mapping (Many-to-Many)
+
+**Locations & Products**
+8. **locations** - Warehouses and stores
+9. **sub_locations** - Location subdivisions (aisles, racks, shelves)
+10. **categories** - Product categories (hierarchical)
+11. **sub_categories** - Product subcategories
+12. **suppliers** - Vendor information
+13. **products** - Product master data
+
+**Inventory & Transactions**
+14. **inventory** - Current stock levels by location
 15. **inventory_transactions** - Stock movement history
-16. **suppliers** - Supplier information
+16. **purchase_orders** - Purchase order headers
+17. **purchase_order_items** - PO line items
+18. **transfer_orders** - Stock transfers between locations
+19. **transfer_order_items** - Transfer line items
 
 ### Key Relationships
 
-- **One-to-Many**: organizations → users, locations, products, etc.
-- **Many-to-Many**: users ↔ roles (via user_roles)
-- **Self-Referencing**: categories → parent_category
-- **Cascade Delete**: When parent records are deleted, children are removed
-- **Restrict**: Cannot delete if dependent records exist
+- **One-to-Many**: 
+  - organizations → users, locations, products
+  - locations → sub_locations, inventory
+  - products → inventory, order items
+  
+- **Many-to-Many**: 
+  - users ↔ roles (via user_roles)
+  - roles ↔ permissions (via role_permissions)
+  
+- **Self-Referencing**: 
+  - categories → parent_category (hierarchical structure)
+
+---
 
 ---
 
