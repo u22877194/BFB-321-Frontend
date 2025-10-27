@@ -4,9 +4,10 @@ A comprehensive web-based inventory management system built with HTML5, CSS3, Bo
 
 ---
 ## Group 3 Members
-u22877194 - Van Wyk Grotius
-u22522281 - Marin Smit
+- u22877194 - Van Wyk Grotius
+- u22522281 - Marin Smit
 
+---
 ## Features
 
 ### Core Modules
