@@ -99,9 +99,13 @@ inventory-management-system/
    ```
 
 2. **Open in VS Code**
-   ```bash
-   code .
-   ```
+   
+   **Using VS Code GUI:**
+   - Open VS Code
+   - Click `File → Open Folder`
+   - Select the `inventory-management-system` folder
+   - Click `Open`
+
 
 3. **Install Live Server Extension**
    - Open VS Code Extensions (Ctrl+Shift+X)
