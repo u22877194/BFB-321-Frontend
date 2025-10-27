@@ -94,8 +94,8 @@ inventory-management-system/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR-USERNAME/inventory-management-system.git
-   cd inventory-management-system
+   git clone https://github.com/u22877194/BFB-321-Inventory-Management-Group3.git
+   cd BFB-321-Inventory-Management-Group3
    ```
 
 2. **Open in VS Code**
