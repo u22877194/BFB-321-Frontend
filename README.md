@@ -3,6 +3,9 @@
 A comprehensive web-based inventory management system built with HTML5, CSS3, Bootstrap 5, and JavaScript.
 
 ---
+## Group 3 Members
+u22877194 - Van Wyk Grotius
+u22522281 - Marin Smit
 
 ## Features
 
