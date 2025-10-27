@@ -103,7 +103,7 @@ inventory-management-system/
    **Using VS Code GUI:**
    - Open VS Code
    - Click `File → Open Folder`
-   - Select the `inventory-management-system` folder
+   - Select the `BFB-321-Inventory-Management-Group3` folder
    - Click `Open`
 
 
