@@ -6,79 +6,154 @@
     <title>Transfer Details - Inventory Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:linear-gradient(180deg,#2c3e50 0%,#34495e 100%);padding:0;transition:all .3s ease;z-index:1000;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1)}.sidebar.collapsed{width:80px}.sidebar-header{padding:20px;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:space-between;color:white;border-bottom:1px solid rgba(255,255,255,0.1)}.sidebar-logo{display:flex;align-items:center;gap:10px}.sidebar-logo i{font-size:24px}.sidebar-header h4{margin:0;font-size:18px;font-weight:600}.sidebar.collapsed .sidebar-header h4{display:none}.toggle-btn{background:none;border:none;color:white;font-size:20px;cursor:pointer;padding:5px}.sidebar-menu{list-style:none;padding:15px 0}.menu-item{margin-bottom:5px}.menu-link{display:flex;align-items:center;padding:12px 20px;color:rgba(255,255,255,0.8);text-decoration:none;transition:all .3s}.menu-link:hover{background:rgba(255,255,255,0.1);color:white}.menu-link.active{background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);color:white;border-left:4px solid #fff}.menu-link i{font-size:20px;width:40px;text-align:center}.menu-link span{margin-left:10px}.sidebar.collapsed .menu-link span{display:none}.menu-section{padding:15px 20px 5px;color:rgba(255,255,255,0.5);font-size:12px;text-transform:uppercase;font-weight:600}.sidebar.collapsed .menu-section{display:none}.main-content{margin-left:260px;transition:all .3s ease;min-height:100vh;background:#f5f6fa}.main-content.expanded{margin-left:80px}
+    </style>
 </head>
 <body>
-    <div class="sidebar" style="position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); z-index: 1000;">
-        <div style="padding: 20px; color: white;">
-            <i class="bi bi-box-seam" style="font-size: 24px;"></i>
-            <h4 style="display: inline; margin-left: 10px;">Inventory MS</h4>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo"><i class="bi bi-box-seam"></i><h4>Inventory MS</h4></div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-list"></i></button>
         </div>
-        <ul style="list-style: none; padding: 15px 0;">
-            <li><a href="../../dashboard.html" style="display: flex; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none;"><i class="bi bi-speedometer2" style="width: 40px;"></i><span>Dashboard</span></a></li>
-            <li><a href="transfer-list.html" style="display: flex; padding: 12px 20px; color: white; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"><i class="bi bi-arrow-left-right" style="width: 40px;"></i><span>Transfer Orders</span></a></li>
+        <ul class="sidebar-menu">
+            <li class="menu-item"><a href="../../dashboard.html" class="menu-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a></li>
+            <div class="menu-section">Inventory</div>
+            <li class="menu-item"><a href="../products/products-list.html" class="menu-link"><i class="bi bi-box"></i><span>Products</span></a></li>
+            <li class="menu-item"><a href="../inventory/inventory-overview.html" class="menu-link"><i class="bi bi-grid-3x3-gap"></i><span>Inventory Overview</span></a></li>
+            <li class="menu-item"><a href="../categories/categories.html" class="menu-link"><i class="bi bi-tags"></i><span>Categories</span></a></li>
+            <div class="menu-section">Orders</div>
+            <li class="menu-item"><a href="../purchase-orders/po-list.html" class="menu-link"><i class="bi bi-cart"></i><span>Purchase Orders</span></a></li>
+            <li class="menu-item"><a href="transfer-list.html" class="menu-link active"><i class="bi bi-arrow-left-right"></i><span>Transfer Orders</span></a></li>
+            <div class="menu-section">Management</div>
+            <li class="menu-item"><a href="../locations/locations.html" class="menu-link"><i class="bi bi-geo-alt"></i><span>Locations</span></a></li>
+            <li class="menu-item"><a href="../suppliers/suppliers.html" class="menu-link"><i class="bi bi-truck"></i><span>Suppliers</span></a></li>
+            <li class="menu-item"><a href="../users/users.html" class="menu-link"><i class="bi bi-people"></i><span>Users</span></a></li>
+            <div class="menu-section">Reports</div>
+            <li class="menu-item"><a href="../reports/stock-report.html" class="menu-link"><i class="bi bi-bar-chart"></i><span>Stock Reports</span></a></li>
+            <li class="menu-item"><a href="../reports/transaction-report.html" class="menu-link"><i class="bi bi-file-earmark-text"></i><span>Transactions</span></a></li>
         </ul>
     </div>
     
-    <div style="margin-left: 260px; min-height: 100vh; background: #f5f6fa; padding: 30px;">
-        <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700;">Transfer Order #TO-2024-001</h1>
-                    <p style="color: #7f8c8d;">Created on October 11, 2024</p>
+    <div class="main-content" id="mainContent">
+        <div style="padding:30px">
+            <div id="loadingState" class="text-center py-5">
+                <div class="spinner-border text-primary"></div>
+                <p class="mt-2 text-muted">Loading transfer...</p>
+            </div>
+            
+            <div id="transferDetails" style="display:none">
+                <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);margin-bottom:25px">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h1 style="font-size:28px;font-weight:700" id="transferTitle">Transfer Order</h1>
+                            <p style="color:#7f8c8d" id="transferDate">Created on...</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="badge" id="statusBadge" style="font-size:14px;padding:10px 20px"></span>
+                            <button class="btn btn-success" id="completeBtn" style="display:none" onclick="completeTransfer()">
+                                <i class="bi bi-check-circle me-2"></i>Mark Complete
+                            </button>
+                            <a href="transfer-list.html" class="btn btn-outline-secondary">Back</a>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <span class="badge bg-info" style="font-size: 14px; padding: 10px 20px;">In Transit</span>
-                    <button class="btn btn-success ms-2">Mark as Received</button>
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);height:100%">
+                            <h3 style="font-size:18px;font-weight:600;margin-bottom:20px"><i class="bi bi-geo-alt me-2"></i>From Location</h3>
+                            <div id="fromLocationInfo">Loading...</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);height:100%">
+                            <h3 style="font-size:18px;font-weight:600;margin-bottom:20px"><i class="bi bi-geo-alt-fill me-2"></i>To Location</h3>
+                            <div id="toLocationInfo">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08)">
+                    <h3 style="font-size:18px;font-weight:600;margin-bottom:20px">Items</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead style="background:#f8f9fa">
+                                <tr><th>Product</th><th>SKU</th><th class="text-center">Quantity</th></tr>
+                            </thead>
+                            <tbody id="itemsTableBody">
+                                <tr><td colspan="3" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="row g-4 mb-4">
-            <div class="col-md-6">
-                <div style="background: white; padding: 25px; border-radius: 15px; height: 100%;">
-                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">From Location</h3>
-                    <p><strong>Main Warehouse</strong></p>
-                    <p class="text-muted">123 Industrial Ave, Johannesburg</p>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div style="background: white; padding: 25px; border-radius: 15px; height: 100%;">
-                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">To Location</h3>
-                    <p><strong>Branch A</strong></p>
-                    <p class="text-muted">456 Commerce St, Pretoria</p>
-                </div>
-            </div>
-        </div>
-        
-        <div style="background: white; padding: 25px; border-radius: 15px;">
-            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">Items</h3>
-            <table class="table">
-                <thead style="background: #f8f9fa;">
-                    <tr>
-                        <th>Product</th>
-                        <th>SKU</th>
-                        <th class="text-center">Quantity</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Office Chair Ergonomic</td>
-                        <td>SKU-002</td>
-                        <td class="text-center">10</td>
-                        <td><span class="badge bg-info">In Transit</span></td>
-                    </tr>
-                    <tr>
-                        <td>USB Flash Drive 32GB</td>
-                        <td>SKU-006</td>
-                        <td class="text-center">5</td>
-                        <td><span class="badge bg-info">In Transit</span></td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/main.js"></script>
+    <script>
+        let currentTransfer = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const transferId = urlParams.get('id');
+        
+        function showNotification(m,t){if(typeof InventoryMS!=='undefined'&&InventoryMS.showNotification){InventoryMS.showNotification(m,t)}else{alert(m)}}
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            await new Promise(r => setTimeout(r, 500));
+            if(!transferId){document.getElementById('loadingState').innerHTML='<div class="alert alert-danger">No ID provided</div>';return}
+            if(!currentUser||!currentUser.organization_id){document.getElementById('loadingState').innerHTML='<div class="alert alert-danger">Please log in</div>';return}
+            await loadTransferDetails();
+        });
+        
+        async function loadTransferDetails() {
+            try {
+                const {data,error} = await supabase.from('transfer_orders').select(`*,from_location:from_location_id(name,address),to_location:to_location_id(name,address),transfer_order_items(*,products(name,sku))`).eq('id',transferId).single();
+                if(error) throw error;
+                currentTransfer=data;
+                displayTransferDetails(data);
+            } catch(error) {
+                console.error('Error:',error);
+                document.getElementById('loadingState').innerHTML='<div class="alert alert-danger">Error: '+error.message+'</div>';
+            }
+        }
+        
+        function displayTransferDetails(t) {
+            document.getElementById('loadingState').style.display='none';
+            document.getElementById('transferDetails').style.display='block';
+            document.getElementById('transferTitle').textContent='Transfer Order #'+t.transfer_number;
+            document.getElementById('transferDate').textContent='Created '+new Date(t.created_at).toLocaleDateString();
+            
+            const statusColors={draft:'secondary',submitted:'warning',in_transit:'info',completed:'success',cancelled:'danger'};
+            const statusLabels={draft:'Draft',submitted:'Submitted',in_transit:'In Transit',completed:'Completed',cancelled:'Cancelled'};
+            const badge=document.getElementById('statusBadge');
+            badge.className='badge bg-'+statusColors[t.status];
+            badge.textContent=statusLabels[t.status];
+            
+            if(t.status==='in_transit'){document.getElementById('completeBtn').style.display='inline-block'}
+            
+            document.getElementById('fromLocationInfo').innerHTML='<p><strong>'+t.from_location.name+'</strong></p><p class="text-muted">'+t.from_location.address+'</p>';
+            document.getElementById('toLocationInfo').innerHTML='<p><strong>'+t.to_location.name+'</strong></p><p class="text-muted">'+t.to_location.address+'</p>';
+            
+            document.getElementById('itemsTableBody').innerHTML=t.transfer_order_items.map(item=>`<tr><td><strong>${item.products.name}</strong></td><td>${item.products.sku}</td><td class="text-center">${item.quantity}</td></tr>`).join('');
+        }
+        
+        async function completeTransfer() {
+            if(!confirm('Mark this transfer as completed?')) return;
+            try {
+                const {error} = await supabase.from('transfer_orders').update({status:'completed',completed_date:new Date().toISOString().split('T')[0]}).eq('id',transferId);
+                if(error) throw error;
+                showNotification('Transfer completed!','success');
+                setTimeout(()=>window.location.reload(),1000);
+            } catch(error) {
+                console.error('Error:',error);
+                showNotification('Error: '+error.message,'danger');
+            }
+        }
+        
+        document.getElementById('sidebarToggle').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('expanded')});
+    </script>
 </body>
 </html>

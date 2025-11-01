@@ -6,6 +6,19 @@
 // ==================== GLOBAL VARIABLES ====================
 const APP_NAME = 'Inventory Management System';
 const API_BASE_URL = 'http://localhost:3000/api'; // Change to your API URL
+
+// Supabase Configuration
+const SUPABASE_URL = 'https://pxfhvplulihsmgtfrqpm.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB4Zmh2cGx1bGloc21ndGZycXBtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk1MzQ2OTYsImV4cCI6MjA3NTExMDY5Nn0._5DKvRk03DGrWF8SBrm_vMkqcfelbd-xN1-OBv9Z_XI';
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+        storage: window.sessionStorage, // Use sessionStorage instead of localStorage
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false
+    }
+}) : null;
+
 let currentUser = null;
 
 // ==================== INITIALIZATION ====================
@@ -36,33 +49,87 @@ function initializeApp() {
 }
 
 // ==================== AUTHENTICATION ====================
-function checkAuthentication() {
-    const userEmail = localStorage.getItem('userEmail');
-    const userOrg = localStorage.getItem('organization');
-    
-    // Skip authentication check for login page
-    if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
+async function checkAuthentication() {
+    // Skip auth check for login page
+    if (window.location.pathname.includes('index.html') || 
+        window.location.pathname === '/' || 
+        window.location.pathname.endsWith('/')) {
         return;
     }
     
-    if (!userEmail || !userOrg) {
-        console.log('User not authenticated, redirecting to login');
-        // Uncomment to enable authentication redirect
-        // window.location.href = 'index.html';
-    } else {
+    // Check if Supabase is loaded
+    if (!supabase) {
+        console.error('Supabase not initialized');
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    try {
+        // Get current session from Supabase
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
+        if (!session) {
+            console.log('No active session, redirecting to login');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        // Set current user with organization data
         currentUser = {
-            email: userEmail,
-            organization: userOrg
+            id: session.user.id,
+            email: session.user.email,
+            organization_id: session.user.user_metadata?.organization_id,
+            full_name: session.user.user_metadata?.full_name || session.user.email
         };
+        
         console.log('User authenticated:', currentUser);
+        
+        // Update UI with user info if elements exist
+        updateUserInfo();
+        
+    } catch (error) {
+        console.error('Auth error:', error);
+        window.location.href = 'index.html';
     }
 }
 
-function logout() {
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('organization');
-    localStorage.removeItem('userToken');
-    window.location.href = 'index.html';
+async function logout() {
+    if (!supabase) {
+        console.error('Supabase not initialized');
+        localStorage.clear();
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        
+        localStorage.clear();
+        window.location.href = 'index.html';
+    } catch (error) {
+        console.error('Logout error:', error);
+        localStorage.clear();
+        window.location.href = 'index.html';
+    }
+}
+
+function updateUserInfo() {
+    if (!currentUser) return;
+    
+    // Update user email display if element exists
+    const userEmailElements = document.querySelectorAll('.user-email');
+    userEmailElements.forEach(el => {
+        el.textContent = currentUser.email;
+    });
+    
+    // Update user name display if element exists
+    const userNameElements = document.querySelectorAll('.user-name');
+    userNameElements.forEach(el => {
+        el.textContent = currentUser.full_name;
+    });
 }
 
 // ==================== SIDEBAR FUNCTIONALITY ====================

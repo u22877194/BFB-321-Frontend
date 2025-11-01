@@ -6,143 +6,332 @@
     <title>Suppliers - Inventory Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:linear-gradient(180deg,#2c3e50 0%,#34495e 100%);padding:0;transition:all .3s ease;z-index:1000;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1)}.sidebar.collapsed{width:80px}.sidebar-header{padding:20px;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:space-between;color:white;border-bottom:1px solid rgba(255,255,255,0.1)}.sidebar-logo{display:flex;align-items:center;gap:10px}.sidebar-logo i{font-size:24px}.sidebar-header h4{margin:0;font-size:18px;font-weight:600}.sidebar.collapsed .sidebar-header h4{display:none}.toggle-btn{background:none;border:none;color:white;font-size:20px;cursor:pointer;padding:5px}.sidebar-menu{list-style:none;padding:15px 0}.menu-item{margin-bottom:5px}.menu-link{display:flex;align-items:center;padding:12px 20px;color:rgba(255,255,255,0.8);text-decoration:none;transition:all .3s}.menu-link:hover{background:rgba(255,255,255,0.1);color:white}.menu-link.active{background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);color:white;border-left:4px solid #fff}.menu-link i{font-size:20px;width:40px;text-align:center}.menu-link span{margin-left:10px}.sidebar.collapsed .menu-link span{display:none}.menu-section{padding:15px 20px 5px;color:rgba(255,255,255,0.5);font-size:12px;text-transform:uppercase;font-weight:600}.sidebar.collapsed .menu-section{display:none}.main-content{margin-left:260px;transition:all .3s ease;min-height:100vh;background:#f5f6fa}.main-content.expanded{margin-left:80px}
+    </style>
 </head>
 <body>
-    <div class="sidebar" style="position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); z-index: 1000;">
-        <div style="padding: 20px; color: white;">
-            <i class="bi bi-box-seam" style="font-size: 24px;"></i>
-            <h4 style="display: inline; margin-left: 10px;">Inventory MS</h4>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo"><i class="bi bi-box-seam"></i><h4>Inventory MS</h4></div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-list"></i></button>
         </div>
-        <ul style="list-style: none; padding: 15px 0;">
-            <li><a href="../../dashboard.html" style="display: flex; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none;"><i class="bi bi-speedometer2" style="width: 40px;"></i><span>Dashboard</span></a></li>
-            <li><a href="suppliers.html" style="display: flex; padding: 12px 20px; color: white; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"><i class="bi bi-truck" style="width: 40px;"></i><span>Suppliers</span></a></li>
+        <ul class="sidebar-menu">
+            <li class="menu-item"><a href="../../dashboard.html" class="menu-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a></li>
+            <div class="menu-section">Inventory</div>
+            <li class="menu-item"><a href="../products/products-list.html" class="menu-link"><i class="bi bi-box"></i><span>Products</span></a></li>
+            <li class="menu-item"><a href="../inventory/inventory-overview.html" class="menu-link"><i class="bi bi-grid-3x3-gap"></i><span>Inventory Overview</span></a></li>
+            <li class="menu-item"><a href="../categories/categories.html" class="menu-link"><i class="bi bi-tags"></i><span>Categories</span></a></li>
+            <div class="menu-section">Orders</div>
+            <li class="menu-item"><a href="../purchase-orders/po-list.html" class="menu-link"><i class="bi bi-cart"></i><span>Purchase Orders</span></a></li>
+            <li class="menu-item"><a href="../transfer-orders/transfer-list.html" class="menu-link"><i class="bi bi-arrow-left-right"></i><span>Transfer Orders</span></a></li>
+            <div class="menu-section">Management</div>
+            <li class="menu-item"><a href="../locations/locations.html" class="menu-link"><i class="bi bi-geo-alt"></i><span>Locations</span></a></li>
+            <li class="menu-item"><a href="suppliers.html" class="menu-link active"><i class="bi bi-truck"></i><span>Suppliers</span></a></li>
+            <li class="menu-item"><a href="../users/users.html" class="menu-link"><i class="bi bi-people"></i><span>Users</span></a></li>
+            <div class="menu-section">Reports</div>
+            <li class="menu-item"><a href="../reports/stock-report.html" class="menu-link"><i class="bi bi-bar-chart"></i><span>Stock Reports</span></a></li>
+            <li class="menu-item"><a href="../reports/transaction-report.html" class="menu-link"><i class="bi bi-file-earmark-text"></i><span>Transactions</span></a></li>
         </ul>
     </div>
     
-    <div style="margin-left: 260px; min-height: 100vh; background: #f5f6fa; padding: 30px;">
-        <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50;">Suppliers</h1>
-                    <p style="color: #7f8c8d;">Manage supplier information</p>
+    <div class="main-content" id="mainContent">
+        <div style="padding:30px">
+            <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);margin-bottom:25px">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 style="font-size:28px;font-weight:700;color:#2c3e50">Suppliers</h1>
+                        <p style="color:#7f8c8d;margin:0">Manage supplier information</p>
+                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
+                        <i class="bi bi-plus-circle me-2"></i>Add Supplier
+                    </button>
                 </div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSupplierModal">
-                    <i class="bi bi-plus-circle me-2"></i>Add Supplier
-                </button>
             </div>
-        </div>
-        
-        <div style="background: white; padding: 25px; border-radius: 15px;">
-            <table class="table">
-                <thead style="background: #f8f9fa;">
-                    <tr>
-                        <th>Supplier Name</th>
-                        <th>Contact Person</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Total POs</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Tech Suppliers Ltd</strong></td>
-                        <td>Sarah Johnson</td>
-                        <td>sarah@techsuppliers.com</td>
-                        <td>+27 11 555 1234</td>
-                        <td>15</td>
-                        <td><span class="badge bg-success">Active</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary">Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Office Equipment Co</strong></td>
-                        <td>Mike Williams</td>
-                        <td>mike@officeequip.com</td>
-                        <td>+27 11 555 5678</td>
-                        <td>12</td>
-                        <td><span class="badge bg-success">Active</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary">Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><strong>Electronics Hub</strong></td>
-                        <td>Lisa Chen</td>
-                        <td>lisa@electronichub.com</td>
-                        <td>+27 11 555 9012</td>
-                        <td>8</td>
-                        <td><span class="badge bg-success">Active</span></td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary">Edit</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            
+            <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08)">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background:#f8f9fa">
+                            <tr>
+                                <th>Supplier Name</th>
+                                <th>Code</th>
+                                <th>Contact Person</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suppliersTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="spinner-border text-primary"></div>
+                                    <p class="mt-2 text-muted">Loading suppliers...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Add Supplier Modal -->
-    <div class="modal fade" id="addSupplierModal" tabindex="-1">
+    <div class="modal fade" id="addSupplierModal" tabindex="-1" aria-labelledby="addSupplierModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-content" style="border-radius:15px">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New Supplier</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="addSupplierModalLabel">Add New Supplier</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="addSupplierForm">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label">Supplier Name *</label>
-                                <input type="text" class="form-control" required>
+                                <input type="text" class="form-control" id="supplierName" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Contact Person *</label>
-                                <input type="text" class="form-control" required>
+                                <label class="form-label">Code *</label>
+                                <input type="text" class="form-control" id="supplierCode" required>
+                                <small class="text-muted">Unique identifier (e.g., SUP001)</small>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Email *</label>
-                                <input type="email" class="form-control" required>
+                                <label class="form-label">Contact Person</label>
+                                <input type="text" class="form-control" id="contactPerson">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Phone *</label>
-                                <input type="tel" class="form-control" required>
+                                <label class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone">
                             </div>
-                            <div class="col-12">
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email">
+                            </div>
+                            <div class="col-md-6">
                                 <label class="form-label">Address</label>
-                                <textarea class="form-control" rows="2"></textarea>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Payment Terms</label>
-                                <select class="form-select">
-                                    <option>Net 30</option>
-                                    <option>Net 60</option>
-                                    <option>Net 90</option>
-                                    <option>COD</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Currency</label>
-                                <select class="form-select">
-                                    <option>ZAR</option>
-                                    <option>USD</option>
-                                    <option>EUR</option>
-                                </select>
+                                <textarea class="form-control" id="address" rows="2"></textarea>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Add Supplier</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSupplier()">Add Supplier</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Supplier Modal -->
+    <div class="modal fade" id="viewSupplierModal" tabindex="-1" aria-labelledby="viewSupplierModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius:15px">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewSupplierModalLabel">Supplier Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="viewSupplierContent">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="mt-2">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/main.js"></script>
+    
+    <script>
+        function showNotification(m,t){if(typeof InventoryMS!=='undefined'&&InventoryMS.showNotification){InventoryMS.showNotification(m,t)}else{alert(m)}}
+        
+        document.addEventListener('DOMContentLoaded',async function(){
+            await new Promise(r=>setTimeout(r,500));
+            if(!currentUser||!currentUser.organization_id){
+                document.getElementById('suppliersTableBody').innerHTML='<tr><td colspan="7" class="text-center text-danger py-4">Please log in</td></tr>';
+                return;
+            }
+            await loadSuppliers();
+        });
+        
+        async function loadSuppliers(){
+            try{
+                const {data:suppliers,error:suppError}=await supabase.from('suppliers').select('*').eq('organization_id',currentUser.organization_id).eq('is_active',true).order('name');
+                if(suppError) throw suppError;
+                
+                // Get PO counts per supplier
+                const {data:poCounts,error:poError}=await supabase.from('purchase_orders').select('supplier_id').eq('organization_id',currentUser.organization_id);
+                if(poError) throw poError;
+                
+                displaySuppliers(suppliers,poCounts||[]);
+            }catch(error){
+                console.error('Error:',error);
+                document.getElementById('suppliersTableBody').innerHTML='<tr><td colspan="7" class="text-center text-danger py-4">Error: '+error.message+'</td></tr>';
+            }
+        }
+        
+        function displaySuppliers(suppliers,poCounts){
+            const tbody=document.getElementById('suppliersTableBody');
+            
+            if(suppliers.length===0){
+                tbody.innerHTML='<tr><td colspan="7" class="text-center py-4"><i class="bi bi-truck" style="font-size:48px;color:#ccc"></i><p class="mt-2 text-muted">No suppliers yet</p><button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addSupplierModal">Add First Supplier</button></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML=suppliers.map(sup=>{
+                const poCount=poCounts.filter(po=>po.supplier_id===sup.id).length;
+                
+                return `
+                    <tr>
+                        <td><strong>${sup.name}</strong></td>
+                        <td><code>${sup.code}</code></td>
+                        <td>${sup.contact_person||'-'}</td>
+                        <td>${sup.email||'-'}</td>
+                        <td>${sup.phone||'-'}</td>
+                        <td><span class="badge bg-success">Active</span></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary" onclick="viewSupplier('${sup.id}')"><i class="bi bi-eye"></i></button>
+                                <button class="btn btn-outline-danger" onclick="deleteSupplier('${sup.id}','${sup.name}')"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        async function saveSupplier(){
+            const name=document.getElementById('supplierName').value;
+            const code=document.getElementById('supplierCode').value;
+            const contactPerson=document.getElementById('contactPerson').value;
+            const email=document.getElementById('email').value;
+            const phone=document.getElementById('phone').value;
+            const address=document.getElementById('address').value;
+            
+            if(!name||!code){showNotification('Please fill required fields','warning');return}
+            
+            try{
+                const {error}=await supabase.from('suppliers').insert([{
+                    organization_id:currentUser.organization_id,
+                    name:name,
+                    code:code.toUpperCase(),
+                    contact_person:contactPerson||null,
+                    email:email||null,
+                    phone:phone||null,
+                    address:address||null,
+                    is_active:true
+                }]);
+                
+                if(error) throw error;
+                
+                showNotification('Supplier added successfully!','success');
+                bootstrap.Modal.getInstance(document.getElementById('addSupplierModal')).hide();
+                document.getElementById('addSupplierForm').reset();
+                await loadSuppliers();
+            }catch(error){
+                console.error('Error:',error);
+                showNotification('Error: '+error.message,'danger');
+            }
+        }
+        
+        async function viewSupplier(id){
+            const modal=new bootstrap.Modal(document.getElementById('viewSupplierModal'));
+            modal.show();
+            
+            try{
+                const {data:supplier,error:suppError}=await supabase.from('suppliers').select('*').eq('id',id).single();
+                if(suppError) throw suppError;
+                
+                const {data:pos,error:poError}=await supabase.from('purchase_orders').select('id,po_number,order_date,status').eq('supplier_id',id).order('order_date',{ascending:false}).limit(10);
+                if(poError) throw poError;
+                
+                document.getElementById('viewSupplierContent').innerHTML=`
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Supplier Name</h6>
+                            <p class="fw-bold">${supplier.name}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Code</h6>
+                            <p><code>${supplier.code}</code></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Contact Person</h6>
+                            <p>${supplier.contact_person||'N/A'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Email</h6>
+                            <p>${supplier.email||'N/A'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Phone</h6>
+                            <p>${supplier.phone||'N/A'}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Address</h6>
+                            <p>${supplier.address||'N/A'}</p>
+                        </div>
+                    </div>
+                    
+                    <h6 class="mb-3">Recent Purchase Orders (${pos.length})</h6>
+                    ${pos.length>0?`
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead style="background:#f8f9fa">
+                                    <tr>
+                                        <th>PO Number</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${pos.map(po=>{
+                                        const statusColors={draft:'secondary',submitted:'warning',approved:'info',received:'success'};
+                                        return `
+                                            <tr>
+                                                <td><a href="../purchase-orders/po-details.html?id=${po.id}" class="text-decoration-none">${po.po_number}</a></td>
+                                                <td>${new Date(po.order_date).toLocaleDateString()}</td>
+                                                <td><span class="badge bg-${statusColors[po.status]}">${po.status}</span></td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `:'<p class="text-muted">No purchase orders yet</p>'}
+                `;
+            }catch(error){
+                console.error('Error:',error);
+                document.getElementById('viewSupplierContent').innerHTML='<div class="alert alert-danger">Error: '+error.message+'</div>';
+            }
+        }
+        
+        async function deleteSupplier(id,name){
+            if(!confirm('Delete supplier "'+name+'"? This will affect related purchase orders.')) return;
+            
+            try{
+                const {error}=await supabase.from('suppliers').update({is_active:false}).eq('id',id);
+                if(error) throw error;
+                
+                showNotification('Supplier deleted','success');
+                await loadSuppliers();
+            }catch(error){
+                console.error('Error:',error);
+                showNotification('Error: '+error.message,'danger');
+            }
+        }
+        
+        document.getElementById('sidebarToggle').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('expanded')});
+    </script>
 </body>
 </html>

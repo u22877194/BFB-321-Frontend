@@ -6,150 +6,255 @@
     <title>Categories - Inventory Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        /* Sidebar Styles - Same as Dashboard */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            padding: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.collapsed { width: 80px; }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar-logo i { font-size: 24px; }
+        
+        .sidebar-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .sidebar.collapsed .sidebar-header h4 { display: none; }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 15px 0;
+        }
+        
+        .menu-item { margin-bottom: 5px; }
+        
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .menu-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .menu-link.active {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left: 4px solid #fff;
+        }
+        
+        .menu-link i {
+            font-size: 20px;
+            width: 40px;
+            text-align: center;
+        }
+        
+        .menu-link span { margin-left: 10px; }
+        
+        .sidebar.collapsed .menu-link span { display: none; }
+        
+        .menu-section {
+            padding: 15px 20px 5px;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .sidebar.collapsed .menu-section { display: none; }
+        
+        .main-content {
+            margin-left: 260px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            background: #f5f6fa;
+        }
+        
+        .main-content.expanded { margin-left: 80px; }
+        
+        /* Category Card Styles */
+        .category-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
-    <div class="sidebar" style="position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); z-index: 1000;">
-        <div style="padding: 20px; color: white;">
-            <i class="bi bi-box-seam" style="font-size: 24px;"></i>
-            <h4 style="display: inline; margin-left: 10px;">Inventory MS</h4>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="bi bi-box-seam"></i>
+                <h4>Inventory MS</h4>
+            </div>
+            <button class="toggle-btn" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
         </div>
-        <ul style="list-style: none; padding: 15px 0;">
-            <li><a href="../../dashboard.html" style="display: flex; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none;"><i class="bi bi-speedometer2" style="width: 40px;"></i><span>Dashboard</span></a></li>
-            <li><a href="categories.html" style="display: flex; padding: 12px 20px; color: white; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"><i class="bi bi-tags" style="width: 40px;"></i><span>Categories</span></a></li>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item">
+                <a href="../../dashboard.html" class="menu-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Inventory</div>
+            
+            <li class="menu-item">
+                <a href="../products/products-list.html" class="menu-link">
+                    <i class="bi bi-box"></i>
+                    <span>Products</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../inventory/inventory-overview.html" class="menu-link">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Inventory Overview</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="categories.html" class="menu-link active">
+                    <i class="bi bi-tags"></i>
+                    <span>Categories</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Orders</div>
+            
+            <li class="menu-item">
+                <a href="../purchase-orders/po-list.html" class="menu-link">
+                    <i class="bi bi-cart"></i>
+                    <span>Purchase Orders</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../transfer-orders/transfer-list.html" class="menu-link">
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>Transfer Orders</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Management</div>
+            
+            <li class="menu-item">
+                <a href="../locations/locations.html" class="menu-link">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>Locations</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../suppliers/suppliers.html" class="menu-link">
+                    <i class="bi bi-truck"></i>
+                    <span>Suppliers</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../users/users.html" class="menu-link">
+                    <i class="bi bi-people"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Reports</div>
+            
+            <li class="menu-item">
+                <a href="../reports/stock-report.html" class="menu-link">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Stock Reports</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../reports/transaction-report.html" class="menu-link">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Transactions</span>
+                </a>
+            </li>
         </ul>
     </div>
     
-    <div style="margin-left: 260px; min-height: 100vh; background: #f5f6fa; padding: 30px;">
-        <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50;">Categories & Sub-Categories</h1>
-                    <p style="color: #7f8c8d;">Organize your product catalog</p>
-                </div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                    <i class="bi bi-plus-circle me-2"></i>Add Category
-                </button>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div style="background: white; padding: 25px; border-radius: 15px;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 style="font-size: 20px; font-weight: 600;">
-                            <i class="bi bi-laptop me-2" style="color: #667eea;"></i>Electronics
-                        </h3>
-                        <span class="badge bg-primary">248 products</span>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div style="padding: 30px;">
+            <!-- Page Header -->
+            <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50;">Categories & Sub-Categories</h1>
+                        <p style="color: #7f8c8d; margin: 0;">Organize your product catalog</p>
                     </div>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Computers</span>
-                            <span class="badge bg-secondary">45</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Laptops</span>
-                            <span class="badge bg-secondary">89</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Monitors</span>
-                            <span class="badge bg-secondary">56</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Peripherals</span>
-                            <span class="badge bg-secondary">58</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary mt-3 w-100">
-                        <i class="bi bi-plus"></i> Add Sub-Category
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <i class="bi bi-plus-circle me-2"></i>Add Category
                     </button>
                 </div>
             </div>
             
-            <div class="col-md-6">
-                <div style="background: white; padding: 25px; border-radius: 15px;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 style="font-size: 20px; font-weight: 600;">
-                            <i class="bi bi-chair me-2" style="color: #27ae60;"></i>Furniture
-                        </h3>
-                        <span class="badge bg-success">156 products</span>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Desks</span>
-                            <span class="badge bg-secondary">32</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Chairs</span>
-                            <span class="badge bg-secondary">78</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Storage</span>
-                            <span class="badge bg-secondary">28</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Tables</span>
-                            <span class="badge bg-secondary">18</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary mt-3 w-100">
-                        <i class="bi bi-plus"></i> Add Sub-Category
-                    </button>
-                </div>
-            </div>
-            
-            <div class="col-md-6">
-                <div style="background: white; padding: 25px; border-radius: 15px;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 style="font-size: 20px; font-weight: 600;">
-                            <i class="bi bi-pencil me-2" style="color: #f39c12;"></i>Office Supplies
-                        </h3>
-                        <span class="badge bg-warning">342 products</span>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Stationery</span>
-                            <span class="badge bg-secondary">156</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Paper Products</span>
-                            <span class="badge bg-secondary">98</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Writing Instruments</span>
-                            <span class="badge bg-secondary">88</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary mt-3 w-100">
-                        <i class="bi bi-plus"></i> Add Sub-Category
-                    </button>
-                </div>
-            </div>
-            
-            <div class="col-md-6">
-                <div style="background: white; padding: 25px; border-radius: 15px;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 style="font-size: 20px; font-weight: 600;">
-                            <i class="bi bi-tools me-2" style="color: #e74c3c;"></i>Hardware
-                        </h3>
-                        <span class="badge bg-danger">89 products</span>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Tools</span>
-                            <span class="badge bg-secondary">45</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Fasteners</span>
-                            <span class="badge bg-secondary">28</span>
-                        </div>
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>Equipment</span>
-                            <span class="badge bg-secondary">16</span>
-                        </div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary mt-3 w-100">
-                        <i class="bi bi-plus"></i> Add Sub-Category
-                    </button>
+            <!-- Categories Grid -->
+            <div class="row g-4" id="categoriesGrid">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Loading categories...</p>
                 </div>
             </div>
         </div>
@@ -164,30 +269,292 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="addCategoryForm">
                         <div class="mb-3">
                             <label class="form-label">Category Name *</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" id="categoryName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Code *</label>
+                            <input type="text" class="form-control" id="categoryCode" required>
+                            <small class="text-muted">Unique identifier (e.g., MEATS, BEVERAGES)</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea class="form-control" rows="2"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Icon Class</label>
-                            <input type="text" class="form-control" placeholder="bi bi-icon-name">
-                            <small class="text-muted">Bootstrap icon class name</small>
+                            <textarea class="form-control" id="categoryDescription" rows="2"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Add Category</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCategory()">Add Category</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Sub-Category Modal -->
+    <div class="modal fade" id="addSubCategoryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Sub-Category</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSubCategoryForm">
+                        <input type="hidden" id="subCategoryParentId">
+                        <div class="mb-3">
+                            <label class="form-label">Parent Category</label>
+                            <input type="text" class="form-control" id="subCategoryParentName" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Sub-Category Name *</label>
+                            <input type="text" class="form-control" id="subCategoryName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Code *</label>
+                            <input type="text" class="form-control" id="subCategoryCode" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="subCategoryDescription" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSubCategory()">Add Sub-Category</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/main.js"></script>
+    
+    <script>
+        let categoriesData = [];
+        
+        // Simple notification
+        function showNotification(message, type) {
+            if (typeof InventoryMS !== 'undefined' && InventoryMS.showNotification) {
+                InventoryMS.showNotification(message, type);
+            } else {
+                alert(message);
+            }
+        }
+        
+        // Load categories on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (!currentUser || !currentUser.organization_id) {
+                document.getElementById('categoriesGrid').innerHTML = `
+                    <div class="col-12 text-center text-danger py-5">
+                        <p>Please log in to view categories.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            await loadCategories();
+        });
+        
+        // Load categories with product counts
+        async function loadCategories() {
+            try {
+                // Get categories
+                const { data: categories, error: catError } = await supabase
+                    .from('categories')
+                    .select('*')
+                    .eq('organization_id', currentUser.organization_id)
+                    .eq('is_active', true)
+                    .order('name');
+                
+                if (catError) throw catError;
+                
+                categoriesData = categories || [];
+                
+                // Get sub-categories
+                const { data: subCategories, error: subError } = await supabase
+                    .from('sub_categories')
+                    .select('*, categories!inner(organization_id)')
+                    .eq('categories.organization_id', currentUser.organization_id)
+                    .eq('is_active', true)
+                    .order('name');
+                
+                if (subError) throw subError;
+                
+                // Get product counts per category
+                const { data: productCounts, error: countError } = await supabase
+                    .from('products')
+                    .select('category_id, sub_category_id')
+                    .eq('organization_id', currentUser.organization_id)
+                    .eq('is_active', true);
+                
+                if (countError) throw countError;
+                
+                displayCategories(categories, subCategories, productCounts);
+                
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                document.getElementById('categoriesGrid').innerHTML = `
+                    <div class="col-12 text-center text-danger py-5">
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Display categories
+        function displayCategories(categories, subCategories, productCounts) {
+            const grid = document.getElementById('categoriesGrid');
+            
+            if (categories.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-tags" style="font-size: 48px; color: #ccc;"></i>
+                        <p class="mt-2 text-muted">No categories yet</p>
+                        <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                            Add First Category
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const icons = ['bi-grid', 'bi-cup-hot', 'bi-cart', 'bi-box-seam', 'bi-bag', 'bi-basket'];
+            const colors = ['#667eea', '#27ae60', '#f39c12', '#e74c3c', '#3498db', '#9b59b6'];
+            
+            grid.innerHTML = categories.map((cat, index) => {
+                // Get sub-categories for this category
+                const subs = subCategories.filter(s => s.category_id === cat.id);
+                
+                // Count products
+                const catCount = productCounts.filter(p => p.category_id === cat.id).length;
+                
+                const icon = icons[index % icons.length];
+                const color = colors[index % colors.length];
+                
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <div class="category-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 style="font-size: 20px; font-weight: 600; margin: 0;">
+                                    <i class="${icon} me-2" style="color: ${color};"></i>${cat.name}
+                                </h3>
+                                <span class="badge" style="background: ${color};">${catCount} products</span>
+                            </div>
+                            
+                            ${subs.length > 0 ? `
+                                <div class="list-group list-group-flush">
+                                    ${subs.map(sub => {
+                                        const subCount = productCounts.filter(p => p.sub_category_id === sub.id).length;
+                                        return `
+                                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                <span>${sub.name}</span>
+                                                <span class="badge bg-secondary">${subCount}</span>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            ` : '<p class="text-muted small">No sub-categories</p>'}
+                            
+                            <button class="btn btn-sm btn-outline-primary mt-3 w-100" onclick="openAddSubCategoryModal('${cat.id}', '${cat.name}')">
+                                <i class="bi bi-plus"></i> Add Sub-Category
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Save new category
+        async function saveCategory() {
+            const name = document.getElementById('categoryName').value;
+            const code = document.getElementById('categoryCode').value;
+            const description = document.getElementById('categoryDescription').value;
+            
+            if (!name || !code) {
+                showNotification('Please fill in required fields', 'warning');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('categories')
+                    .insert([{
+                        organization_id: currentUser.organization_id,
+                        name: name,
+                        code: code.toUpperCase(),
+                        description: description || null,
+                        is_active: true
+                    }])
+                    .select();
+                
+                if (error) throw error;
+                
+                showNotification('Category added successfully!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('addCategoryModal')).hide();
+                document.getElementById('addCategoryForm').reset();
+                await loadCategories();
+                
+            } catch (error) {
+                console.error('Error adding category:', error);
+                showNotification('Error: ' + error.message, 'danger');
+            }
+        }
+        
+        // Open add sub-category modal
+        function openAddSubCategoryModal(categoryId, categoryName) {
+            document.getElementById('subCategoryParentId').value = categoryId;
+            document.getElementById('subCategoryParentName').value = categoryName;
+            new bootstrap.Modal(document.getElementById('addSubCategoryModal')).show();
+        }
+        
+        // Save new sub-category
+        async function saveSubCategory() {
+            const categoryId = document.getElementById('subCategoryParentId').value;
+            const name = document.getElementById('subCategoryName').value;
+            const code = document.getElementById('subCategoryCode').value;
+            const description = document.getElementById('subCategoryDescription').value;
+            
+            if (!name || !code) {
+                showNotification('Please fill in required fields', 'warning');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('sub_categories')
+                    .insert([{
+                        category_id: categoryId,
+                        name: name,
+                        code: code.toUpperCase(),
+                        description: description || null,
+                        is_active: true
+                    }])
+                    .select();
+                
+                if (error) throw error;
+                
+                showNotification('Sub-category added successfully!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('addSubCategoryModal')).hide();
+                document.getElementById('addSubCategoryForm').reset();
+                await loadCategories();
+                
+            } catch (error) {
+                console.error('Error adding sub-category:', error);
+                showNotification('Error: ' + error.message, 'danger');
+            }
+        }
+        
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('expanded');
+        });
+    </script>
 </body>
 </html>

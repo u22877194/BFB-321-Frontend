@@ -6,114 +6,380 @@
     <title>Transfer Orders - Inventory Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            padding: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .sidebar.collapsed { width: 80px; }
+        .sidebar-header {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-logo { display: flex; align-items: center; gap: 10px; }
+        .sidebar-logo i { font-size: 24px; }
+        .sidebar-header h4 { margin: 0; font-size: 18px; font-weight: 600; }
+        .sidebar.collapsed .sidebar-header h4 { display: none; }
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .sidebar-menu { list-style: none; padding: 15px 0; }
+        .menu-item { margin-bottom: 5px; }
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .menu-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .menu-link.active {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left: 4px solid #fff;
+        }
+        .menu-link i { font-size: 20px; width: 40px; text-align: center; }
+        .menu-link span { margin-left: 10px; }
+        .sidebar.collapsed .menu-link span { display: none; }
+        .menu-section {
+            padding: 15px 20px 5px;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .sidebar.collapsed .menu-section { display: none; }
+        .main-content {
+            margin-left: 260px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            background: #f5f6fa;
+        }
+        .main-content.expanded { margin-left: 80px; }
+    </style>
 </head>
 <body>
-    <div class="sidebar" style="position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); z-index: 1000;">
-        <div style="padding: 20px; color: white;">
-            <i class="bi bi-box-seam" style="font-size: 24px;"></i>
-            <h4 style="display: inline; margin-left: 10px;">Inventory MS</h4>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="bi bi-box-seam"></i>
+                <h4>Inventory MS</h4>
+            </div>
+            <button class="toggle-btn" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
         </div>
-        <ul style="list-style: none; padding: 15px 0;">
-            <li><a href="../../dashboard.html" style="display: flex; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none;"><i class="bi bi-speedometer2" style="width: 40px;"></i><span>Dashboard</span></a></li>
-            <li><a href="transfer-list.html" style="display: flex; padding: 12px 20px; color: white; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"><i class="bi bi-arrow-left-right" style="width: 40px;"></i><span>Transfer Orders</span></a></li>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item">
+                <a href="../../dashboard.html" class="menu-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Inventory</div>
+            
+            <li class="menu-item">
+                <a href="../products/products-list.html" class="menu-link">
+                    <i class="bi bi-box"></i>
+                    <span>Products</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../inventory/inventory-overview.html" class="menu-link">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Inventory Overview</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../categories/categories.html" class="menu-link">
+                    <i class="bi bi-tags"></i>
+                    <span>Categories</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Orders</div>
+            
+            <li class="menu-item">
+                <a href="../purchase-orders/po-list.html" class="menu-link">
+                    <i class="bi bi-cart"></i>
+                    <span>Purchase Orders</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="transfer-list.html" class="menu-link active">
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>Transfer Orders</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Management</div>
+            
+            <li class="menu-item">
+                <a href="../locations/locations.html" class="menu-link">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>Locations</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../suppliers/suppliers.html" class="menu-link">
+                    <i class="bi bi-truck"></i>
+                    <span>Suppliers</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../users/users.html" class="menu-link">
+                    <i class="bi bi-people"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Reports</div>
+            
+            <li class="menu-item">
+                <a href="../reports/stock-report.html" class="menu-link">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Stock Reports</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../reports/transaction-report.html" class="menu-link">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Transactions</span>
+                </a>
+            </li>
         </ul>
     </div>
     
-    <div style="margin-left: 260px; min-height: 100vh; background: #f5f6fa; padding: 30px;">
-        <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
-            <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50;">Create Transfer Order</h1>
-        </div>
+    <div class="main-content" id="mainContent">
+        <nav style="background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="../../dashboard.html" style="color: #667eea;">Home</a></li>
+                <li class="breadcrumb-item active">Transfer Orders</li>
+            </ol>
+        </nav>
         
-        <form id="createTransferForm">
-            <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 20px;">
-                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">Transfer Information</h3>
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">Transfer ID</label>
-                        <input type="text" class="form-control" value="TO-2024-003" readonly style="background: #f8f9fa;">
+        <div style="padding: 30px;">
+            <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 25px;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50; margin: 0;">Transfer Orders</h1>
+                        <p style="color: #7f8c8d; margin: 5px 0 0 0;">Manage inventory transfers between locations</p>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">From Location *</label>
-                        <select class="form-select" required>
-                            <option value="">Select Location</option>
-                            <option>Main Warehouse</option>
-                            <option>Branch A</option>
-                            <option>Branch B</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">To Location *</label>
-                        <select class="form-select" required>
-                            <option value="">Select Location</option>
-                            <option>Main Warehouse</option>
-                            <option>Branch A</option>
-                            <option>Branch B</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Expected Transfer Date</label>
-                        <input type="date" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Reason for Transfer</label>
-                        <select class="form-select">
-                            <option>Stock Rebalancing</option>
-                            <option>Customer Request</option>
-                            <option>Restocking</option>
-                            <option>Other</option>
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Notes</label>
-                        <textarea class="form-control" rows="2"></textarea>
-                    </div>
+                    <a href="create-transfer.html" class="btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none;">
+                        <i class="bi bi-plus-circle me-2"></i>Create Transfer
+                    </a>
                 </div>
             </div>
             
-            <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 20px;">
-                <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">Items to Transfer</h3>
-                <table class="table">
-                    <thead style="background: #f8f9fa;">
-                        <tr>
-                            <th>Product</th>
-                            <th>Available Stock</th>
-                            <th>Quantity to Transfer</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <select class="form-select">
-                                    <option>Laptop HP EliteBook 840</option>
-                                    <option>Office Chair Ergonomic</option>
-                                </select>
-                            </td>
-                            <td><span class="badge bg-success">125 units</span></td>
-                            <td><input type="number" class="form-control" value="10" min="1"></td>
-                            <td><button type="button" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button type="button" class="btn btn-sm btn-primary"><i class="bi bi-plus"></i> Add Item</button>
-            </div>
+            <ul class="nav nav-tabs mb-4" id="statusTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" onclick="filterByStatus('all', event)">All (<span id="count-all">0</span>)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="filterByStatus('draft', event)">Draft (<span id="count-draft">0</span>)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="filterByStatus('submitted', event)">Submitted (<span id="count-submitted">0</span>)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="filterByStatus('in_transit', event)">In Transit (<span id="count-in_transit">0</span>)</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="filterByStatus('completed', event)">Completed (<span id="count-completed">0</span>)</a>
+                </li>
+            </ul>
             
-            <div style="background: white; padding: 25px; border-radius: 15px;">
-                <div class="d-flex justify-content-between">
-                    <a href="transfer-list.html" class="btn btn-outline-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Submit Transfer</button>
+            <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background: #f8f9fa;">
+                            <tr>
+                                <th>Transfer #</th>
+                                <th>Date</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th>Items</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transferTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <p class="mt-2 text-muted">Loading transfers...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../js/main.js"></script>
+    
     <script>
-        document.getElementById('createTransferForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Transfer order created successfully!');
-            window.location.href = 'transfer-list.html';
+        let allTransfers = [];
+        
+        function showNotification(message, type) {
+            if (typeof InventoryMS !== 'undefined' && InventoryMS.showNotification) {
+                InventoryMS.showNotification(message, type);
+            } else {
+                alert(message);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (!currentUser || !currentUser.organization_id) {
+                document.getElementById('transferTableBody').innerHTML = `
+                    <tr><td colspan="7" class="text-center text-danger py-4">Please log in</td></tr>
+                `;
+                return;
+            }
+            
+            await loadTransfers();
+        });
+        
+        async function loadTransfers() {
+            try {
+                const { data, error } = await supabase
+                    .from('transfer_orders')
+                    .select(`
+                        *,
+                        from_location:from_location_id (name),
+                        to_location:to_location_id (name),
+                        transfer_order_items (quantity)
+                    `)
+                    .eq('organization_id', currentUser.organization_id)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                allTransfers = data || [];
+                updateStatusCounts();
+                displayTransfers(allTransfers);
+                
+            } catch (error) {
+                console.error('Error loading transfers:', error);
+                document.getElementById('transferTableBody').innerHTML = `
+                    <tr><td colspan="7" class="text-center text-danger py-4">Error: ${error.message}</td></tr>
+                `;
+            }
+        }
+        
+        function updateStatusCounts() {
+            document.getElementById('count-all').textContent = allTransfers.length;
+            document.getElementById('count-draft').textContent = allTransfers.filter(t => t.status === 'draft').length;
+            document.getElementById('count-submitted').textContent = allTransfers.filter(t => t.status === 'submitted').length;
+            document.getElementById('count-in_transit').textContent = allTransfers.filter(t => t.status === 'in_transit').length;
+            document.getElementById('count-completed').textContent = allTransfers.filter(t => t.status === 'completed').length;
+        }
+        
+        function displayTransfers(transfers) {
+            const tbody = document.getElementById('transferTableBody');
+            
+            if (transfers.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <i class="bi bi-arrow-left-right" style="font-size: 48px; color: #ccc;"></i>
+                            <p class="mt-2 text-muted">No transfer orders found</p>
+                            <a href="create-transfer.html" class="btn btn-primary mt-2">Create First Transfer</a>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = transfers.map(transfer => {
+                const totalItems = transfer.transfer_order_items?.reduce((sum, item) => sum + parseFloat(item.quantity), 0) || 0;
+                
+                const statusColors = {
+                    draft: 'secondary',
+                    submitted: 'warning',
+                    in_transit: 'info',
+                    completed: 'success',
+                    cancelled: 'danger'
+                };
+                
+                const statusLabels = {
+                    draft: 'Draft',
+                    submitted: 'Submitted',
+                    in_transit: 'In Transit',
+                    completed: 'Completed',
+                    cancelled: 'Cancelled'
+                };
+                
+                return `
+                    <tr>
+                        <td><strong>${transfer.transfer_number}</strong></td>
+                        <td>${new Date(transfer.transfer_date).toLocaleDateString()}</td>
+                        <td>${transfer.from_location?.name || 'N/A'}</td>
+                        <td>${transfer.to_location?.name || 'N/A'}</td>
+                        <td>${totalItems} items</td>
+                        <td><span class="badge bg-${statusColors[transfer.status]}">${statusLabels[transfer.status]}</span></td>
+                        <td>
+                            <a href="transfer-details.html?id=${transfer.id}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function filterByStatus(status, event) {
+            if (event) {
+                event.preventDefault();
+                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+                event.target.classList.add('active');
+            }
+            
+            if (status === 'all') {
+                displayTransfers(allTransfers);
+            } else {
+                const filtered = allTransfers.filter(t => t.status === status);
+                displayTransfers(filtered);
+            }
+        }
+        
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('expanded');
         });
     </script>
 </body>

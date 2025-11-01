@@ -6,124 +6,273 @@
     <title>Purchase Order Details - Inventory Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            padding: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar.collapsed { width: 80px; }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-logo { display: flex; align-items: center; gap: 10px; }
+        .sidebar-logo i { font-size: 24px; }
+        .sidebar-header h4 { margin: 0; font-size: 18px; font-weight: 600; }
+        .sidebar.collapsed .sidebar-header h4 { display: none; }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .sidebar-menu { list-style: none; padding: 15px 0; }
+        .menu-item { margin-bottom: 5px; }
+        
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .menu-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        
+        .menu-link.active {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left: 4px solid #fff;
+        }
+        
+        .menu-link i { font-size: 20px; width: 40px; text-align: center; }
+        .menu-link span { margin-left: 10px; }
+        .sidebar.collapsed .menu-link span { display: none; }
+        
+        .menu-section {
+            padding: 15px 20px 5px;
+            color: rgba(255,255,255,0.5);
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .sidebar.collapsed .menu-section { display: none; }
+        
+        .main-content {
+            margin-left: 260px;
+            transition: all 0.3s ease;
+            min-height: 100vh;
+            background: #f5f6fa;
+        }
+        
+        .main-content.expanded { margin-left: 80px; }
+    </style>
 </head>
 <body>
-    <div class="sidebar" id="sidebar" style="position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); z-index: 1000;">
-        <div style="padding: 20px; background: rgba(0,0,0,0.2); color: white;">
-            <i class="bi bi-box-seam" style="font-size: 24px;"></i>
-            <h4 style="display: inline; margin-left: 10px;">Inventory MS</h4>
+    <!-- Sidebar (Same as PO List) -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="bi bi-box-seam"></i>
+                <h4>Inventory MS</h4>
+            </div>
+            <button class="toggle-btn" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
         </div>
-        <ul style="list-style: none; padding: 15px 0;">
-            <li><a href="../../dashboard.html" style="display: flex; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none;"><i class="bi bi-speedometer2" style="width: 40px;"></i><span>Dashboard</span></a></li>
-            <li><a href="po-list.html" style="display: flex; padding: 12px 20px; color: white; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"><i class="bi bi-cart" style="width: 40px;"></i><span>Purchase Orders</span></a></li>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item">
+                <a href="../../dashboard.html" class="menu-link">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Inventory</div>
+            
+            <li class="menu-item">
+                <a href="../products/products-list.html" class="menu-link">
+                    <i class="bi bi-box"></i>
+                    <span>Products</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../inventory/inventory-overview.html" class="menu-link">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Inventory Overview</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../categories/categories.html" class="menu-link">
+                    <i class="bi bi-tags"></i>
+                    <span>Categories</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Orders</div>
+            
+            <li class="menu-item">
+                <a href="po-list.html" class="menu-link active">
+                    <i class="bi bi-cart"></i>
+                    <span>Purchase Orders</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../transfer-orders/transfer-list.html" class="menu-link">
+                    <i class="bi bi-arrow-left-right"></i>
+                    <span>Transfer Orders</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Management</div>
+            
+            <li class="menu-item">
+                <a href="../locations/locations.html" class="menu-link">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>Locations</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../suppliers/suppliers.html" class="menu-link">
+                    <i class="bi bi-truck"></i>
+                    <span>Suppliers</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../users/users.html" class="menu-link">
+                    <i class="bi bi-people"></i>
+                    <span>Users</span>
+                </a>
+            </li>
+            
+            <div class="menu-section">Reports</div>
+            
+            <li class="menu-item">
+                <a href="../reports/stock-report.html" class="menu-link">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Stock Reports</span>
+                </a>
+            </li>
+            
+            <li class="menu-item">
+                <a href="../reports/transaction-report.html" class="menu-link">
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Transactions</span>
+                </a>
+            </li>
         </ul>
     </div>
     
-    <div style="margin-left: 260px; min-height: 100vh; background: #f5f6fa; padding: 30px;">
-        <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 25px;">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50;">Purchase Order #PO-2024-001</h1>
-                    <p style="color: #7f8c8d; margin: 5px 0 0 0;">Created on October 11, 2024</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <span class="badge bg-warning" style="font-size: 14px; padding: 10px 20px;">Pending Approval</span>
-                    <button class="btn btn-success" onclick="approvePO()"><i class="bi bi-check-circle me-2"></i>Approve</button>
-                    <button class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer me-2"></i>Print</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); height: 100%;">
-                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;"><i class="bi bi-truck me-2"></i>Supplier Information</h3>
-                    <table class="table table-borderless">
-                        <tr><td class="fw-semibold">Supplier:</td><td>Tech Suppliers Ltd</td></tr>
-                        <tr><td class="fw-semibold">Contact Person:</td><td>Sarah Johnson</td></tr>
-                        <tr><td class="fw-semibold">Email:</td><td>sarah@techsuppliers.com</td></tr>
-                        <tr><td class="fw-semibold">Phone:</td><td>+27 11 555 1234</td></tr>
-                    </table>
-                </div>
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div style="padding: 30px;">
+            <!-- Loading State -->
+            <div id="loadingState" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">Loading purchase order...</p>
             </div>
             
-            <div class="col-md-6">
-                <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); height: 100%;">
-                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;"><i class="bi bi-geo-alt me-2"></i>Delivery Information</h3>
-                    <table class="table table-borderless">
-                        <tr><td class="fw-semibold">Destination:</td><td>Main Warehouse</td></tr>
-                        <tr><td class="fw-semibold">Address:</td><td>123 Industrial Ave, Johannesburg</td></tr>
-                        <tr><td class="fw-semibold">Expected Date:</td><td>October 20, 2024</td></tr>
-                        <tr><td class="fw-semibold">Reference:</td><td>REF-2024-Q4-001</td></tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-top: 25px;">
-            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">Order Items</h3>
-            <table class="table">
-                <thead style="background: #f8f9fa;">
-                    <tr>
-                        <th>Product</th>
-                        <th>Description</th>
-                        <th class="text-center">Quantity</th>
-                        <th class="text-end">Unit Price</th>
-                        <th class="text-end">Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Laptop HP EliteBook 840</strong></td>
-                        <td>Intel Core i7, 16GB RAM, 512GB SSD</td>
-                        <td class="text-center">25</td>
-                        <td class="text-end">R12,000.00</td>
-                        <td class="text-end">R300,000.00</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Monitor Dell 27" 4K</strong></td>
-                        <td>UHD Display, USB-C</td>
-                        <td class="text-center">20</td>
-                        <td class="text-end">R8,500.00</td>
-                        <td class="text-end">R170,000.00</td>
-                    </tr>
-                </tbody>
-                <tfoot style="border-top: 2px solid #000;">
-                    <tr>
-                        <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
-                        <td class="text-end">R470,000.00</td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="text-end"><strong>Tax (15%):</strong></td>
-                        <td class="text-end">R70,500.00</td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" class="text-end"><strong style="font-size: 18px;">Grand Total:</strong></td>
-                        <td class="text-end"><strong style="font-size: 18px;">R540,500.00</strong></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-        
-        <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-top: 25px;">
-            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">Activity Timeline</h3>
-            <div class="timeline">
-                <div class="mb-3 pb-3 border-bottom">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-circle-fill text-primary me-3"></i>
+            <!-- PO Details (Hidden initially) -->
+            <div id="poDetails" style="display: none;">
+                <!-- Header -->
+                <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-bottom: 25px;">
+                    <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>PO Created</strong>
-                            <p class="mb-0 text-muted small">October 11, 2024 10:30 AM by John Doe</p>
+                            <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50;" id="poTitle">Purchase Order</h1>
+                            <p style="color: #7f8c8d; margin: 5px 0 0 0;" id="poDate">Created on...</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="badge" id="statusBadge" style="font-size: 14px; padding: 10px 20px;"></span>
+                            <button class="btn btn-success" id="approveBtn" style="display: none;" onclick="approvePO()">
+                                <i class="bi bi-check-circle me-2"></i>Approve
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="window.print()">
+                                <i class="bi bi-printer me-2"></i>Print
+                            </button>
+                            <a href="po-list.html" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Back
+                            </a>
                         </div>
                     </div>
                 </div>
-                <div class="mb-3">
-                    <div class="d-flex align-items-center">
-                        <i class="bi bi-circle text-muted me-3"></i>
-                        <div>
-                            <strong>Pending Approval</strong>
-                            <p class="mb-0 text-muted small">Awaiting manager approval</p>
+                
+                <!-- Info Cards -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); height: 100%;">
+                            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">
+                                <i class="bi bi-truck me-2"></i>Supplier Information
+                            </h3>
+                            <table class="table table-borderless" id="supplierInfo">
+                                <tr><td colspan="2">Loading...</td></tr>
+                            </table>
                         </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); height: 100%;">
+                            <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">
+                                <i class="bi bi-geo-alt me-2"></i>Delivery Information
+                            </h3>
+                            <table class="table table-borderless" id="deliveryInfo">
+                                <tr><td colspan="2">Loading...</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Items Table -->
+                <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); margin-top: 25px;">
+                    <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 20px;">Order Items</h3>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead style="background: #f8f9fa;">
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="text-center">Quantity Ordered</th>
+                                    <th class="text-center">Quantity Received</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody">
+                                <tr><td colspan="5" class="text-center">Loading items...</td></tr>
+                            </tbody>
+                            <tfoot style="border-top: 2px solid #000;" id="itemsTableFooter">
+                            </tfoot>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -132,13 +281,212 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../js/main.js"></script>
+    
     <script>
-        function approvePO() {
-            if (confirm('Approve this purchase order?')) {
-                alert('Purchase Order approved successfully!');
-                window.location.href = 'po-list.html';
+        let currentPO = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const poId = urlParams.get('id');
+        
+        function showNotification(message, type) {
+            if (typeof InventoryMS !== 'undefined' && InventoryMS.showNotification) {
+                InventoryMS.showNotification(message, type);
+            } else {
+                alert(message);
             }
         }
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (!poId) {
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="alert alert-danger">No PO ID provided</div>
+                    <a href="po-list.html" class="btn btn-primary">Back to List</a>
+                `;
+                return;
+            }
+            
+            if (!currentUser || !currentUser.organization_id) {
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="alert alert-danger">Please log in to view purchase order</div>
+                `;
+                return;
+            }
+            
+            await loadPODetails();
+        });
+        
+        async function loadPODetails() {
+            try {
+                const { data, error } = await supabase
+                    .from('purchase_orders')
+                    .select(`
+                        *,
+                        suppliers (name, contact_person, email, phone),
+                        locations (name, address),
+                        purchase_order_items (
+                            *,
+                            products (name, sku)
+                        )
+                    `)
+                    .eq('id', poId)
+                    .single();
+                
+                if (error) throw error;
+                
+                currentPO = data;
+                displayPODetails(data);
+                
+            } catch (error) {
+                console.error('Error loading PO:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="alert alert-danger">Error: ${error.message}</div>
+                    <a href="po-list.html" class="btn btn-primary">Back to List</a>
+                `;
+            }
+        }
+        
+        function displayPODetails(po) {
+            // Hide loading, show details
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('poDetails').style.display = 'block';
+            
+            // Header
+            document.getElementById('poTitle').textContent = `Purchase Order #${po.po_number}`;
+            document.getElementById('poDate').textContent = `Created on ${new Date(po.created_at).toLocaleDateString()}`;
+            
+            // Status badge
+            const statusColors = {
+                draft: 'secondary',
+                submitted: 'warning',
+                approved: 'info',
+                received: 'success',
+                cancelled: 'danger'
+            };
+            
+            const statusLabels = {
+                draft: 'Draft',
+                submitted: 'Pending Approval',
+                approved: 'Approved',
+                received: 'Received',
+                cancelled: 'Cancelled'
+            };
+            
+            const badge = document.getElementById('statusBadge');
+            badge.className = `badge bg-${statusColors[po.status]}`;
+            badge.textContent = statusLabels[po.status];
+            
+            // Show approve button if status is submitted
+            if (po.status === 'submitted') {
+                document.getElementById('approveBtn').style.display = 'inline-block';
+            }
+            
+            // Supplier info
+            document.getElementById('supplierInfo').innerHTML = `
+                <tr>
+                    <td class="fw-semibold">Supplier:</td>
+                    <td>${po.suppliers?.name || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td class="fw-semibold">Contact Person:</td>
+                    <td>${po.suppliers?.contact_person || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td class="fw-semibold">Email:</td>
+                    <td>${po.suppliers?.email || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td class="fw-semibold">Phone:</td>
+                    <td>${po.suppliers?.phone || 'N/A'}</td>
+                </tr>
+            `;
+            
+            // Delivery info
+            document.getElementById('deliveryInfo').innerHTML = `
+                <tr>
+                    <td class="fw-semibold">Destination:</td>
+                    <td>${po.locations?.name || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td class="fw-semibold">Address:</td>
+                    <td>${po.locations?.address || 'N/A'}</td>
+                </tr>
+                <tr>
+                    <td class="fw-semibold">Order Date:</td>
+                    <td>${new Date(po.order_date).toLocaleDateString()}</td>
+                </tr>
+                <tr>
+                    <td class="fw-semibold">Expected Date:</td>
+                    <td>${po.expected_date ? new Date(po.expected_date).toLocaleDateString() : 'Not set'}</td>
+                </tr>
+                ${po.notes ? `<tr><td class="fw-semibold">Notes:</td><td>${po.notes}</td></tr>` : ''}
+            `;
+            
+            // Items table
+            let subtotal = 0;
+            const itemsHtml = po.purchase_order_items.map(item => {
+                const total = parseFloat(item.quantity_ordered) * parseFloat(item.unit_price);
+                subtotal += total;
+                
+                return `
+                    <tr>
+                        <td>
+                            <strong>${item.products?.name || 'Unknown Product'}</strong><br>
+                            <small class="text-muted">SKU: ${item.products?.sku || 'N/A'}</small>
+                        </td>
+                        <td class="text-center">${item.quantity_ordered}</td>
+                        <td class="text-center">${item.quantity_received || 0}</td>
+                        <td class="text-end">R${parseFloat(item.unit_price).toLocaleString('en-ZA', {minimumFractionDigits: 2})}</td>
+                        <td class="text-end">R${total.toLocaleString('en-ZA', {minimumFractionDigits: 2})}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            const tax = subtotal * 0.15;
+            const grandTotal = subtotal + tax;
+            
+            document.getElementById('itemsTableBody').innerHTML = itemsHtml;
+            document.getElementById('itemsTableFooter').innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
+                    <td class="text-end">R${subtotal.toLocaleString('en-ZA', {minimumFractionDigits: 2})}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-end"><strong>Tax (15%):</strong></td>
+                    <td class="text-end">R${tax.toLocaleString('en-ZA', {minimumFractionDigits: 2})}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-end"><strong style="font-size: 18px;">Grand Total:</strong></td>
+                    <td class="text-end"><strong style="font-size: 18px;">R${grandTotal.toLocaleString('en-ZA', {minimumFractionDigits: 2})}</strong></td>
+                </tr>
+            `;
+        }
+        
+        async function approvePO() {
+            if (!confirm('Approve this purchase order?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('purchase_orders')
+                    .update({ status: 'approved' })
+                    .eq('id', poId);
+                
+                if (error) throw error;
+                
+                showNotification('Purchase Order approved successfully!', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+                
+            } catch (error) {
+                console.error('Error approving PO:', error);
+                showNotification('Error: ' + error.message, 'danger');
+            }
+        }
+        
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('expanded');
+        });
     </script>
 </body>
 </html>

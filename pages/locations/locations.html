@@ -6,144 +6,305 @@
     <title>Locations - Inventory Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        .sidebar{position:fixed;top:0;left:0;height:100vh;width:260px;background:linear-gradient(180deg,#2c3e50 0%,#34495e 100%);padding:0;transition:all .3s ease;z-index:1000;overflow-y:auto;box-shadow:2px 0 10px rgba(0,0,0,0.1)}.sidebar.collapsed{width:80px}.sidebar-header{padding:20px;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:space-between;color:white;border-bottom:1px solid rgba(255,255,255,0.1)}.sidebar-logo{display:flex;align-items:center;gap:10px}.sidebar-logo i{font-size:24px}.sidebar-header h4{margin:0;font-size:18px;font-weight:600}.sidebar.collapsed .sidebar-header h4{display:none}.toggle-btn{background:none;border:none;color:white;font-size:20px;cursor:pointer;padding:5px}.sidebar-menu{list-style:none;padding:15px 0}.menu-item{margin-bottom:5px}.menu-link{display:flex;align-items:center;padding:12px 20px;color:rgba(255,255,255,0.8);text-decoration:none;transition:all .3s}.menu-link:hover{background:rgba(255,255,255,0.1);color:white}.menu-link.active{background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);color:white;border-left:4px solid #fff}.menu-link i{font-size:20px;width:40px;text-align:center}.menu-link span{margin-left:10px}.sidebar.collapsed .menu-link span{display:none}.menu-section{padding:15px 20px 5px;color:rgba(255,255,255,0.5);font-size:12px;text-transform:uppercase;font-weight:600}.sidebar.collapsed .menu-section{display:none}.main-content{margin-left:260px;transition:all .3s ease;min-height:100vh;background:#f5f6fa}.main-content.expanded{margin-left:80px}
+    </style>
 </head>
 <body>
-    <div class="sidebar" style="position: fixed; top: 0; left: 0; height: 100vh; width: 260px; background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%); z-index: 1000;">
-        <div style="padding: 20px; color: white;">
-            <i class="bi bi-box-seam" style="font-size: 24px;"></i>
-            <h4 style="display: inline; margin-left: 10px;">Inventory MS</h4>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo"><i class="bi bi-box-seam"></i><h4>Inventory MS</h4></div>
+            <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-list"></i></button>
         </div>
-        <ul style="list-style: none; padding: 15px 0;">
-            <li><a href="../../dashboard.html" style="display: flex; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none;"><i class="bi bi-speedometer2" style="width: 40px;"></i><span>Dashboard</span></a></li>
-            <li><a href="locations.html" style="display: flex; padding: 12px 20px; color: white; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);"><i class="bi bi-geo-alt" style="width: 40px;"></i><span>Locations</span></a></li>
+        <ul class="sidebar-menu">
+            <li class="menu-item"><a href="../../dashboard.html" class="menu-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a></li>
+            <div class="menu-section">Inventory</div>
+            <li class="menu-item"><a href="../products/products-list.html" class="menu-link"><i class="bi bi-box"></i><span>Products</span></a></li>
+            <li class="menu-item"><a href="../inventory/inventory-overview.html" class="menu-link"><i class="bi bi-grid-3x3-gap"></i><span>Inventory Overview</span></a></li>
+            <li class="menu-item"><a href="../categories/categories.html" class="menu-link"><i class="bi bi-tags"></i><span>Categories</span></a></li>
+            <div class="menu-section">Orders</div>
+            <li class="menu-item"><a href="../purchase-orders/po-list.html" class="menu-link"><i class="bi bi-cart"></i><span>Purchase Orders</span></a></li>
+            <li class="menu-item"><a href="../transfer-orders/transfer-list.html" class="menu-link"><i class="bi bi-arrow-left-right"></i><span>Transfer Orders</span></a></li>
+            <div class="menu-section">Management</div>
+            <li class="menu-item"><a href="locations.html" class="menu-link active"><i class="bi bi-geo-alt"></i><span>Locations</span></a></li>
+            <li class="menu-item"><a href="../suppliers/suppliers.html" class="menu-link"><i class="bi bi-truck"></i><span>Suppliers</span></a></li>
+            <li class="menu-item"><a href="../users/users.html" class="menu-link"><i class="bi bi-people"></i><span>Users</span></a></li>
+            <div class="menu-section">Reports</div>
+            <li class="menu-item"><a href="../reports/stock-report.html" class="menu-link"><i class="bi bi-bar-chart"></i><span>Stock Reports</span></a></li>
+            <li class="menu-item"><a href="../reports/transaction-report.html" class="menu-link"><i class="bi bi-file-earmark-text"></i><span>Transactions</span></a></li>
         </ul>
     </div>
     
-    <div style="margin-left: 260px; min-height: 100vh; background: #f5f6fa; padding: 30px;">
-        <div style="background: white; padding: 25px; border-radius: 15px; margin-bottom: 25px;">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50;">Locations</h1>
-                    <p style="color: #7f8c8d;">Manage warehouses and branches</p>
-                </div>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLocationModal">
-                    <i class="bi bi-plus-circle me-2"></i>Add Location
-                </button>
-            </div>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-4">
-                <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
-                    <div style="width: 60px; height: 60px; border-radius: 12px; background: rgba(102, 126, 234, 0.1); color: #667eea; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 15px;">
-                        <i class="bi bi-building"></i>
+    <div class="main-content" id="mainContent">
+        <div style="padding:30px">
+            <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08);margin-bottom:25px">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 style="font-size:28px;font-weight:700;color:#2c3e50">Locations</h1>
+                        <p style="color:#7f8c8d;margin:0">Manage warehouses and branches</p>
                     </div>
-                    <h3 style="font-size: 20px; font-weight: 600;">Main Warehouse</h3>
-                    <p style="color: #7f8c8d; font-size: 14px;">123 Industrial Ave, Johannesburg</p>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Total Stock:</span>
-                        <strong>1,548 units</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Capacity:</span>
-                        <strong>92%</strong>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-primary flex-fill">View</button>
-                        <button class="btn btn-sm btn-outline-secondary flex-fill">Edit</button>
-                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLocationModal">
+                        <i class="bi bi-plus-circle me-2"></i>Add Location
+                    </button>
                 </div>
             </div>
             
-            <div class="col-md-6 col-lg-4">
-                <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
-                    <div style="width: 60px; height: 60px; border-radius: 12px; background: rgba(39, 174, 96, 0.1); color: #27ae60; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 15px;">
-                        <i class="bi bi-shop"></i>
-                    </div>
-                    <h3 style="font-size: 20px; font-weight: 600;">Branch A</h3>
-                    <p style="color: #7f8c8d; font-size: 14px;">456 Commerce St, Pretoria</p>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Total Stock:</span>
-                        <strong>845 units</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Capacity:</span>
-                        <strong>68%</strong>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-primary flex-fill">View</button>
-                        <button class="btn btn-sm btn-outline-secondary flex-fill">Edit</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="col-md-6 col-lg-4">
-                <div style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.08);">
-                    <div style="width: 60px; height: 60px; border-radius: 12px; background: rgba(243, 156, 18, 0.1); color: #f39c12; display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 15px;">
-                        <i class="bi bi-shop"></i>
-                    </div>
-                    <h3 style="font-size: 20px; font-weight: 600;">Branch B</h3>
-                    <p style="color: #7f8c8d; font-size: 14px;">789 Market Rd, Cape Town</p>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted">Total Stock:</span>
-                        <strong>692 units</strong>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Capacity:</span>
-                        <strong>55%</strong>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-outline-primary flex-fill">View</button>
-                        <button class="btn btn-sm btn-outline-secondary flex-fill">Edit</button>
-                    </div>
+            <div class="row g-4" id="locationsGrid">
+                <div class="col-12 text-center py-5">
+                    <div class="spinner-border text-primary"></div>
+                    <p class="mt-2 text-muted">Loading locations...</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Add Location Modal -->
-    <div class="modal fade" id="addLocationModal" tabindex="-1">
+    <div class="modal fade" id="addLocationModal" tabindex="-1" aria-labelledby="addLocationModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" style="border-radius: 15px;">
+            <div class="modal-content" style="border-radius:15px">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add New Location</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="addLocationModalLabel">Add New Location</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="addLocationForm">
                         <div class="mb-3">
                             <label class="form-label">Location Name *</label>
-                            <input type="text" class="form-control" required>
+                            <input type="text" class="form-control" id="locationName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Code *</label>
+                            <input type="text" class="form-control" id="locationCode" required>
+                            <small class="text-muted">Unique identifier (e.g., WH01, BRANCH-A)</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Address</label>
-                            <textarea class="form-control" rows="2"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Location Type</label>
-                            <select class="form-select">
-                                <option>Warehouse</option>
-                                <option>Branch</option>
-                                <option>Distribution Center</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Manager</label>
-                            <input type="text" class="form-control">
+                            <textarea class="form-control" id="locationAddress" rows="2"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary">Add Location</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLocation()">Add Location</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Location Modal -->
+    <div class="modal fade" id="viewLocationModal" tabindex="-1" aria-labelledby="viewLocationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius:15px">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewLocationModalLabel">Location Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="viewLocationContent">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary"></div>
+                            <p class="mt-2">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../js/main.js"></script>
+    
+    <script>
+        function showNotification(m,t){if(typeof InventoryMS!=='undefined'&&InventoryMS.showNotification){InventoryMS.showNotification(m,t)}else{alert(m)}}
+        
+        document.addEventListener('DOMContentLoaded',async function(){
+            await new Promise(r=>setTimeout(r,500));
+            if(!currentUser||!currentUser.organization_id){
+                document.getElementById('locationsGrid').innerHTML='<div class="col-12 text-center text-danger py-5"><p>Please log in</p></div>';
+                return;
+            }
+            await loadLocations();
+        });
+        
+        async function loadLocations(){
+            try{
+                const {data:locations,error:locError}=await supabase.from('locations').select('*').eq('organization_id',currentUser.organization_id).eq('is_active',true).order('name');
+                if(locError) throw locError;
+                
+                // Get inventory for all locations belonging to this organization
+                const locationIds = locations.map(l => l.id);
+                const {data:inventory,error:invError}=await supabase.from('inventory').select('location_id,quantity').in('location_id',locationIds);
+                if(invError) throw invError;
+                
+                displayLocations(locations,inventory||[]);
+            }catch(error){
+                console.error('Error:',error);
+                document.getElementById('locationsGrid').innerHTML='<div class="col-12 text-center text-danger py-5"><p>Error: '+error.message+'</p></div>';
+            }
+        }
+        
+        function displayLocations(locations,inventory){
+            const grid=document.getElementById('locationsGrid');
+            
+            if(locations.length===0){
+                grid.innerHTML='<div class="col-12 text-center py-5"><i class="bi bi-geo-alt" style="font-size:48px;color:#ccc"></i><p class="mt-2 text-muted">No locations yet</p><button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addLocationModal">Add First Location</button></div>';
+                return;
+            }
+            
+            const icons=['bi-building','bi-shop','bi-house','bi-geo-alt-fill'];
+            const colors=['#667eea','#27ae60','#f39c12','#e74c3c'];
+            
+            grid.innerHTML=locations.map((loc,idx)=>{
+                const locInventory=inventory.filter(i=>i.location_id===loc.id);
+                const totalStock=locInventory.reduce((sum,i)=>sum+parseFloat(i.quantity),0);
+                
+                const icon=icons[idx%icons.length];
+                const color=colors[idx%colors.length];
+                
+                return `
+                    <div class="col-md-6 col-lg-4">
+                        <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.08)">
+                            <div style="width:60px;height:60px;border-radius:12px;background:${color}20;color:${color};display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:15px">
+                                <i class="bi ${icon}"></i>
+                            </div>
+                            <h3 style="font-size:20px;font-weight:600">${loc.name}</h3>
+                            <p style="color:#7f8c8d;font-size:14px">${loc.address||'No address'}</p>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="text-muted">Total Stock:</span>
+                                <strong>${totalStock.toFixed(0)} units</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="text-muted">Code:</span>
+                                <strong>${loc.code}</strong>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-primary flex-fill" onclick="viewLocation('${loc.id}')">View</button>
+                                <button class="btn btn-sm btn-outline-danger flex-fill" onclick="deleteLocation('${loc.id}','${loc.name}')">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        async function saveLocation(){
+            const name=document.getElementById('locationName').value;
+            const code=document.getElementById('locationCode').value;
+            const address=document.getElementById('locationAddress').value;
+            
+            if(!name||!code){showNotification('Please fill required fields','warning');return}
+            
+            try{
+                const {error}=await supabase.from('locations').insert([{
+                    organization_id:currentUser.organization_id,
+                    name:name,
+                    code:code.toUpperCase(),
+                    address:address||null,
+                    is_active:true
+                }]);
+                
+                if(error) throw error;
+                
+                showNotification('Location added successfully!','success');
+                bootstrap.Modal.getInstance(document.getElementById('addLocationModal')).hide();
+                document.getElementById('addLocationForm').reset();
+                await loadLocations();
+            }catch(error){
+                console.error('Error:',error);
+                showNotification('Error: '+error.message,'danger');
+            }
+        }
+        
+        async function viewLocation(id){
+            const modal = new bootstrap.Modal(document.getElementById('viewLocationModal'));
+            modal.show();
+            
+            try{
+                // Get location details
+                const {data:location,error:locError}=await supabase.from('locations').select('*').eq('id',id).single();
+                if(locError) throw locError;
+                
+                // Get inventory at this location with product details
+                const {data:inventory,error:invError}=await supabase.from('inventory').select('quantity,products(name,sku)').eq('location_id',id);
+                if(invError) throw invError;
+                
+                const totalStock = inventory.reduce((sum,i)=>sum+parseFloat(i.quantity),0);
+                
+                document.getElementById('viewLocationContent').innerHTML=`
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Location Name</h6>
+                            <p class="fw-bold">${location.name}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Code</h6>
+                            <p class="fw-bold">${location.code}</p>
+                        </div>
+                        <div class="col-md-12">
+                            <h6 class="text-muted">Address</h6>
+                            <p>${location.address||'No address'}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mb-4">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Total Stock:</strong> ${totalStock.toFixed(0)} units across ${inventory.length} products
+                    </div>
+                    
+                    <h6 class="mb-3">Inventory at this Location</h6>
+                    ${inventory.length>0?`
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead style="background:#f8f9fa">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>SKU</th>
+                                        <th class="text-end">Quantity</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${inventory.map(i=>`
+                                        <tr>
+                                            <td>${i.products.name}</td>
+                                            <td><code>${i.products.sku}</code></td>
+                                            <td class="text-end">${i.quantity}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `:'<p class="text-muted">No inventory at this location</p>'}
+                `;
+            }catch(error){
+                console.error('Error:',error);
+                document.getElementById('viewLocationContent').innerHTML=`
+                    <div class="alert alert-danger">Error: ${error.message}</div>
+                `;
+            }
+        }
+        
+        async function deleteLocation(id,name){
+            if(!confirm('Delete location "'+name+'"? This will also delete all inventory at this location.')) return;
+            
+            try{
+                const {error}=await supabase.from('locations').update({is_active:false}).eq('id',id);
+                if(error) throw error;
+                
+                showNotification('Location deleted','success');
+                await loadLocations();
+            }catch(error){
+                console.error('Error:',error);
+                showNotification('Error: '+error.message,'danger');
+            }
+        }
+        
+        document.getElementById('sidebarToggle').addEventListener('click',function(){document.getElementById('sidebar').classList.toggle('collapsed');document.getElementById('mainContent').classList.toggle('expanded')});
+    </script>
 </body>
 </html>
